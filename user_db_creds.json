@@ -1,8 +1,8 @@
 {
-  "balaji.yuvarajan@gmail.com": {
-    "host": "sql5.freesqldatabase.com",
-    "user": "sql5809564",
-    "password": "Sc7cHgSskB",
-    "database": "sql5809564"
-  }
+  "host": "131.189.152.247",
+  "port": "54320",
+  "user": "postgres",
+  "password": "postgres",
+  "database": "reporting_data",
+  "schema": "public"
 }
