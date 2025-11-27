@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv/
+venv/
+ENV/
+
+# Local Config (Don't commit secrets!)
+db_config.json
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
