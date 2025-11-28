@@ -162,12 +162,12 @@ with st.sidebar:
     """, unsafe_allow_html=True)
     
     # Connection Mode Selector with better styling
-    st.markdown("""
+    st.markdown(f"""
     <div style="
         font-size: 0.9rem;
         font-weight: 600;
         margin-bottom: 12px;
-        color: #4a5568;
+        color: {SECONDARY};
     ">
         CONNECTION TYPE
     </div>
@@ -265,13 +265,13 @@ with st.sidebar:
         saved_config = st.session_state.get('db_config', {})
         
         # Professional connection form
-        st.markdown("""
+        st.markdown(f"""
         <div style="
             font-size: 0.9rem;
             font-weight: 600;
             margin: 24px 0 16px 0;
-            color: #4a5568;
-            border-bottom: 1px solid #e2e8f0;
+            color: {SECONDARY};
+            border-bottom: 1px solid {CARD_BORDER};
             padding-bottom: 8px;
         ">
             📊 DATABASE SETTINGS
@@ -286,7 +286,7 @@ with st.sidebar:
                 index=0 if saved_config.get("type") == "PostgreSQL" else (1 if saved_config.get("type") == "MySQL" else 0)
             )
             
-            st.markdown("<div style='margin: 16px 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #4a5568;'>CONNECTION DETAILS</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='margin: 16px 0 8px 0; font-size: 0.85rem; font-weight: 600; color: {SECONDARY};'>CONNECTION DETAILS</div>", unsafe_allow_html=True)
             
             # Server Details
             col1, col2 = st.columns([2, 1])
@@ -324,7 +324,7 @@ with st.sidebar:
             else:
                 db_schema = None
             
-            st.markdown("<div style='margin: 16px 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #4a5568;'>AUTHENTICATION</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='margin: 16px 0 8px 0; font-size: 0.85rem; font-weight: 600; color: {SECONDARY};'>AUTHENTICATION</div>", unsafe_allow_html=True)
             
             # Credentials
             db_user = st.text_input(
@@ -396,16 +396,16 @@ with st.sidebar:
     if 'db_config' in st.session_state:
         cfg = st.session_state['db_config']
         
-        st.markdown("""
+        st.markdown(f"""
         <div style="
             margin-top: 32px;
             padding-top: 20px;
-            border-top: 2px solid #e2e8f0;
+            border-top: 2px solid {CARD_BORDER};
         ">
             <div style="
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: #4a5568;
+                color: {SECONDARY};
                 margin-bottom: 12px;
             ">
                 CONNECTION STATUS
