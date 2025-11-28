@@ -1,9 +1,12 @@
 import os
 import json
 import re
+import base64
+from pathlib import Path
 import pandas as pd
 import streamlit as st
 import psycopg2
+import mysql.connector
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -23,53 +26,226 @@ if not OPENAI_KEY:
 
 client = OpenAI(api_key=OPENAI_KEY)
 
-# 🗂 Load PostgreSQL credentials
-CONFIG_FILE = "user_db_creds.json"
-try:
-    with open(CONFIG_FILE, "r") as f:
-        cfg = json.load(f)
-except Exception:
-    st.error("❌ Database credentials JSON missing or invalid")
+# 💾 Credential persistence helpers
+CREDS_FILE = Path.home() / ".asksql_credentials.json"
+
+def save_credentials(config):
+    """Save credentials to local file (base64 encoded for basic obfuscation)"""
+    try:
+        # Encode password for basic obfuscation (NOT encryption, just prevents plain text)
+        config_copy = config.copy()
+        if config_copy.get('password'):
+            config_copy['password'] = base64.b64encode(config_copy['password'].encode()).decode()
+        
+        with open(CREDS_FILE, 'w') as f:
+            json.dump(config_copy, f)
+        return True
+    except Exception as e:
+        st.error(f"Failed to save credentials: {e}")
+        return False
+
+def load_credentials():
+    """Load credentials from local file"""
+    try:
+        if CREDS_FILE.exists():
+            with open(CREDS_FILE, 'r') as f:
+                config = json.load(f)
+            # Decode password
+            if config.get('password'):
+                config['password'] = base64.b64decode(config['password'].encode()).decode()
+            return config
+        return {}
+    except Exception as e:
+        return {}
+
+def clear_saved_credentials():
+    """Delete saved credentials file"""
+    try:
+        if CREDS_FILE.exists():
+            CREDS_FILE.unlink()
+        return True
+    except Exception:
+        return False
+
+
+# 🔌 Sidebar Database Connection
+with st.sidebar:
+    st.header("🔌 Database Connection")
+    
+    # Load saved credentials from file if not in session
+    if 'db_config' not in st.session_state:
+        loaded_config = load_credentials()
+        if loaded_config:
+            st.session_state['db_config'] = loaded_config
+            st.session_state['remember_me'] = True
+    
+    # Get saved values from session state if they exist
+    saved_config = st.session_state.get('db_config', {})
+    
+    with st.form("db_creds"):
+        st.caption("Enter Database Credentials")
+        db_type = st.selectbox(
+            "Database Type", 
+            ["PostgreSQL", "MySQL"],
+            index=0 if saved_config.get("type") == "PostgreSQL" else (1 if saved_config.get("type") == "MySQL" else 0)
+        )
+        db_host = st.text_input(
+            "Host", 
+            value=saved_config.get("host", "localhost"),
+            help="Database host address",
+            key="host_input"
+        )
+        db_port = st.text_input(
+            "Port", 
+            value=str(saved_config.get("port", "5432" if db_type == "PostgreSQL" else "3306")),
+            help="Database port number",
+            key="port_input"
+        )
+        db_user = st.text_input(
+            "User", 
+            value=saved_config.get("user", "postgres" if db_type == "PostgreSQL" else "root"),
+            help="Database username",
+            key="user_input"
+        )
+        db_pass = st.text_input(
+            "Password", 
+            type="password",
+            value=saved_config.get("password", ""),
+            help="Database password",
+            key="pass_input"
+        )
+        db_name = st.text_input(
+            "Database Name", 
+            value=saved_config.get("database", "postgres" if db_type == "PostgreSQL" else ""),
+            help="Name of the database to connect to",
+            key="db_input"
+        )
+        
+        # Schema is only relevant for PostgreSQL
+        if db_type == "PostgreSQL":
+            db_schema = st.text_input(
+                "Schema", 
+                value=saved_config.get("schema", "public"),
+                help="PostgreSQL schema name",
+                key="schema_input"
+            )
+        else:
+            db_schema = None
+        
+        # Remember Me checkbox
+        remember_me = st.checkbox(
+            "💾 Remember credentials on this computer",
+            value=st.session_state.get('remember_me', False),
+            help="Saves credentials to ~/.asksql_credentials.json (base64 encoded)"
+        )
+            
+        col1, col2 = st.columns(2)
+        with col1:
+            connect_btn = st.form_submit_button("🔌 Connect", use_container_width=True)
+        with col2:
+            clear_btn = st.form_submit_button("🗑️ Clear", use_container_width=True)
+    
+    if connect_btn:
+        # Save to session state
+        st.session_state['db_config'] = {
+            "type": db_type,
+            "host": db_host, "port": db_port, "user": db_user, 
+            "password": db_pass, "database": db_name, "schema": db_schema
+        }
+        st.session_state['remember_me'] = remember_me
+        
+        # Save to file if Remember Me is checked
+        if remember_me:
+            if save_credentials(st.session_state['db_config']):
+                st.success("✅ Connected & credentials saved!")
+            else:
+                st.success("✅ Connected!")
+        else:
+            # Clear saved file if Remember Me is unchecked
+            clear_saved_credentials()
+            st.success("✅ Connected!")
+        
+        st.rerun()
+    
+    if clear_btn:
+        # Clear session state
+        if 'db_config' in st.session_state:
+            del st.session_state['db_config']
+        if 'remember_me' in st.session_state:
+            del st.session_state['remember_me']
+        
+        # Clear saved file
+        clear_saved_credentials()
+        st.info("🗑️ Credentials cleared!")
+        st.rerun()
+    
+    # Show connection status
+    if 'db_config' in st.session_state:
+        cfg = st.session_state['db_config']
+        st.success(f"✅ Connected to **{cfg['type']}** at `{cfg['host']}:{cfg['port']}`")
+        
+        # Show if credentials are saved
+        if CREDS_FILE.exists():
+            st.caption("💾 Credentials saved to disk")
+
+
+if 'db_config' not in st.session_state:
+    st.info("👈 Please enter your database credentials in the sidebar to get started.")
     st.stop()
 
-DB_HOST = cfg.get("host")
-DB_PORT = int(cfg.get("port", 5432))
-DB_USER = cfg.get("user")
-DB_PASS = cfg.get("password")
-DB_NAME = cfg.get("database")
-DB_SCHEMA = cfg.get("schema", "public")
-
-if not DB_HOST or not DB_USER or not DB_NAME:
-    st.error("❌ Database creds incomplete")
-    st.stop()
+# Load config from session state
+DB_TYPE = st.session_state['db_config']['type']
+DB_HOST = st.session_state['db_config']['host']
+DB_PORT = int(st.session_state['db_config']['port'])
+DB_USER = st.session_state['db_config']['user']
+DB_PASS = st.session_state['db_config']['password']
+DB_NAME = st.session_state['db_config']['database']
+DB_SCHEMA = st.session_state['db_config']['schema'] if st.session_state['db_config']['schema'] else 'public'
 
 # 🔍 Safe Schema Discovery
 @st.cache_resource(ttl=300, show_spinner=True)
-def get_schema():
+def get_schema(db_type, host, port, user, password, dbname, schema):
     try:
-        conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, database=DB_NAME)
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT table_name FROM information_schema.tables
-            WHERE table_schema = %s AND table_type='BASE TABLE'
-            ORDER BY table_name
-        """, (DB_SCHEMA,))
-        tables = [r[0] for r in cur.fetchall()]
-        schema = {}
-        for t in tables:
+        if db_type == "PostgreSQL":
+            conn = psycopg2.connect(host=host, port=port, user=user, password=password, database=dbname)
+            cur = conn.cursor()
             cur.execute("""
-                SELECT column_name FROM information_schema.columns
-                WHERE table_schema=%s AND table_name=%s
-                ORDER BY ordinal_position
-            """, (DB_SCHEMA, t))
-            schema[t] = [c[0] for c in cur.fetchall()]
-        cur.close()
-        conn.close()
-        return schema
+                SELECT table_name FROM information_schema.tables
+                WHERE table_schema = %s AND table_type='BASE TABLE'
+                ORDER BY table_name
+            """, (schema,))
+            tables = [r[0] for r in cur.fetchall()]
+            
+            schema_dict = {}
+            for t in tables:
+                cur.execute("""
+                    SELECT column_name FROM information_schema.columns
+                    WHERE table_schema=%s AND table_name=%s
+                    ORDER BY ordinal_position
+                """, (schema, t))
+                schema_dict[t] = [c[0] for c in cur.fetchall()]
+            cur.close()
+            conn.close()
+            return schema_dict
+            
+        elif db_type == "MySQL":
+            conn = mysql.connector.connect(host=host, port=port, user=user, password=password, database=dbname)
+            cur = conn.cursor()
+            cur.execute("SHOW TABLES")
+            tables = [r[0] for r in cur.fetchall()]
+            
+            schema_dict = {}
+            for t in tables:
+                cur.execute(f"DESCRIBE `{t}`")
+                schema_dict[t] = [r[0] for r in cur.fetchall()]
+            cur.close()
+            conn.close()
+            return schema_dict
+            
     except Exception as e:
         return {"_error": str(e)}
 
-schema_objects = get_schema()
+schema_objects = get_schema(DB_TYPE, DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME, DB_SCHEMA)
 
 if "_error" in schema_objects:
     schema_objects = {}
@@ -85,7 +261,25 @@ def generate_sql(nl_text: str) -> str:
         return "SELECT 'Schema unavailable' AS error_message LIMIT 100"
 
     schema_desc = "\n".join(f'TABLE "{t}" (columns: {", ".join(schema_objects[t])})' for t in TABLES)
-    system_prompt = f"""You are AskSQL, a PostgreSQL expert.
+    
+    if DB_TYPE == "MySQL":
+        system_prompt = f"""You are AskSQL, a MySQL expert.
+    
+    Database Schema:
+    {schema_desc}
+    
+    Rules:
+    1. Build ONE valid MySQL SELECT query.
+    2. Use ONLY tables and columns from the schema above.
+    3. Do NOT use schema/database prefixes (e.g., use 'table_name', NOT 'database.table_name').
+    4. Do NOT query information_schema, mysql, or any system tables.
+    5. If the user asks to "show tables" or "list tables", respond with: SELECT 'Available tables: {", ".join(TABLES)}' AS tables LIMIT 100
+    6. If the user asks for "summary", infer the correct table from the schema.
+    7. Always include LIMIT 100 if not specified.
+    8. No semicolons.
+    """
+    else:  # PostgreSQL
+        system_prompt = f"""You are AskSQL, a PostgreSQL expert.
     
     Database Schema:
     {schema_desc}
@@ -93,9 +287,11 @@ def generate_sql(nl_text: str) -> str:
     Rules:
     1. Build ONE valid PostgreSQL SELECT query.
     2. Use ONLY tables and columns from the schema above.
-    3. If the user asks for "summary", infer the correct table from the schema.
-    4. Always include LIMIT 100 if not specified.
-    5. No semicolons.
+    3. Do NOT query information_schema, pg_catalog, or any system tables.
+    4. If the user asks to "show tables" or "list tables", respond with: SELECT 'Available tables: {", ".join(TABLES)}' AS tables LIMIT 100
+    5. If the user asks for "summary", infer the correct table from the schema.
+    6. Always include LIMIT 100 if not specified.
+    7. No semicolons.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
@@ -110,7 +306,11 @@ def generate_sql(nl_text: str) -> str:
 # ⚙ SQL query execution
 def run_query(sql: str) -> pd.DataFrame:
     try:
-        conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, database=DB_NAME)
+        if DB_TYPE == "PostgreSQL":
+            conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, database=DB_NAME)
+        elif DB_TYPE == "MySQL":
+            conn = mysql.connector.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, database=DB_NAME)
+            
         df = pd.read_sql(sql, conn)
         conn.close()
         return df
@@ -177,6 +377,23 @@ st.markdown(f"""
         transition: all 0.2s;
     }}
 </style>
+
+<script>
+    // Enable browser password manager
+    document.addEventListener('DOMContentLoaded', function() {{
+        // Find password input and add autocomplete
+        const inputs = document.querySelectorAll('input[type="password"]');
+        inputs.forEach(input => {{
+            input.setAttribute('autocomplete', 'current-password');
+        }});
+        
+        // Find username/user inputs
+        const userInputs = document.querySelectorAll('input[aria-label*="User"]');
+        userInputs.forEach(input => {{
+            input.setAttribute('autocomplete', 'username');
+        }});
+    }});
+</script>
 """, unsafe_allow_html=True)
 
 with col_title:
