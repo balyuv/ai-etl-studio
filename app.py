@@ -50,11 +50,12 @@ if dark_mode:
     ROOT_BG = "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%)"
     ROOT_BG_SOLID = "#0a0e27"
     ROOT_TEXT = "#ffffff"
-    CARD_BG = "rgba(30, 35, 55, 0.7)"
+    CARD_BG = "rgba(40, 48, 75, 0.75)"  # Lighter blue-gray for better visibility
+    INPUT_BG = "rgba(255, 255, 255, 0.08)" # Light overlay for inputs
     CARD_BORDER = "rgba(88, 166, 255, 0.3)"
     ACCENT = "#00d4ff"
     ACCENT_HOVER = "#00f0ff"
-    SECONDARY = "#a0aec0"
+    SECONDARY = "#cbd5e0" # Lighter gray for better text contrast
     SUCCESS = "#00ff88"
     SHADOW = "0 20px 60px rgba(0, 0, 0, 0.6)"
     GLOW = "0 0 40px rgba(0, 212, 255, 0.5)"
@@ -66,6 +67,7 @@ else:
     ROOT_BG_SOLID = "#ffffff"
     ROOT_TEXT = "#1a202c"
     CARD_BG = "rgba(255, 255, 255, 0.85)"
+    INPUT_BG = "rgba(255, 255, 255, 0.9)"
     CARD_BORDER = "rgba(102, 126, 234, 0.25)"
     ACCENT = "#667eea"
     ACCENT_HOVER = "#5568d3"
@@ -773,7 +775,7 @@ st.markdown(f"""
     
     /* Premium Form Inputs */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {{
-        background: {CARD_BG};
+        background: {INPUT_BG};
         backdrop-filter: blur(10px);
         border: 2px solid {CARD_BORDER};
         border-radius: 14px;
@@ -801,7 +803,7 @@ st.markdown(f"""
     }}
     
     [data-testid="stSidebar"] .stRadio label {{
-        background: {CARD_BG};
+        background: {INPUT_BG};
         padding: 14px 18px;
         border-radius: 12px;
         border: 2px solid {CARD_BORDER};
