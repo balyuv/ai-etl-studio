@@ -466,8 +466,7 @@ def run_query(sql: str) -> pd.DataFrame:
         st.error(f"❌ SQL Execution Failed: {e}")
         return pd.DataFrame()
 
-# 🎨 Themes & Styling
-# 🎨 Themes & Styling
+# 🎨 Premium UI Design System
 # Header Layout with Theme Toggle
 col_title, col_toggle = st.columns([7, 1])
 
@@ -477,65 +476,262 @@ with col_toggle:
     dark_mode = st.toggle("🌗", value=True)
 
 if dark_mode:
-    ROOT_BG = "#0F172A"
-    ROOT_TEXT = "#F8FAFC"
-    CARD_BG = "#1E293B"
-    ACCENT = "#38BDF8"
+    # Modern dark theme - inspired by VS Code, GitHub Dark
+    ROOT_BG = "linear-gradient(135deg, #0d1117 0%, #161b22 100%)"
+    ROOT_BG_SOLID = "#0d1117"
+    ROOT_TEXT = "#e6edf3"
+    CARD_BG = "rgba(22, 27, 34, 0.8)"
+    CARD_BORDER = "rgba(48, 54, 61, 0.5)"
+    ACCENT = "#58a6ff"
+    ACCENT_HOVER = "#79c0ff"
+    SECONDARY = "#8b949e"
+    SUCCESS = "#3fb950"
+    SHADOW = "0 8px 32px rgba(0, 0, 0, 0.4)"
+    GLOW = "0 0 20px rgba(88, 166, 255, 0.3)"
 else:
-    ROOT_BG = "#FFFFFF"
-    ROOT_TEXT = "#0F172A"
-    CARD_BG = "#F1F5F9"
-    ACCENT = "#0284C7"
+    # Modern light theme - inspired by Google Material, Apple Design
+    ROOT_BG = "linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%)"
+    ROOT_BG_SOLID = "#ffffff"
+    ROOT_TEXT = "#1f2328"
+    CARD_BG = "rgba(255, 255, 255, 0.9)"
+    CARD_BORDER = "rgba(208, 215, 222, 0.5)"
+    ACCENT = "#0969da"
+    ACCENT_HOVER = "#0550ae"
+    SECONDARY = "#656d76"
+    SUCCESS = "#1a7f37"
+    SHADOW = "0 8px 32px rgba(31, 35, 40, 0.12)"
+    GLOW = "0 0 20px rgba(9, 105, 218, 0.2)"
 
 st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     
+    /* Root Styling */
     .stApp {{
-        background-color: {ROOT_BG};
+        background: {ROOT_BG};
         color: {ROOT_TEXT};
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }}
     
-    /* Headings */
+    /* Smooth scrolling */
+    html {{
+        scroll-behavior: smooth;
+    }}
+    
+    /* Typography Hierarchy */
     h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {{
         font-family: 'Inter', sans-serif;
         font-weight: 700;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.03em;
         color: {ROOT_TEXT};
+        line-height: 1.2;
     }}
     
-    /* Chips for columns */
+    /* Premium Container Styling */
+    [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {{
+        background: {CARD_BG};
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid {CARD_BORDER};
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: {SHADOW};
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }}
+    
+    /* Glassmorphism Cards */
+    .stContainer {{
+        background: {CARD_BG};
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid {CARD_BORDER};
+        border-radius: 16px;
+        box-shadow: {SHADOW};
+    }}
+    
+    /* Column Chips - Modern Badge Design */
     .col-chip {{
-        display: inline-block;
-        background-color: {ACCENT}20;
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, {ACCENT}15, {ACCENT}25);
         color: {ACCENT};
-        border: 1px solid {ACCENT}40;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin: 2px 4px 2px 0;
+        border: 1px solid {ACCENT}30;
+        padding: 6px 14px;
+        border-radius: 24px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 4px 6px 4px 0;
+        transition: all 0.2s ease;
+        letter-spacing: 0.01em;
     }}
     
-    /* Button Styling */
+    .col-chip:hover {{
+        background: linear-gradient(135deg, {ACCENT}25, {ACCENT}35);
+        border-color: {ACCENT}50;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px {ACCENT}20;
+    }}
+    
+    /* Premium Button Styling */
     .stButton button {{
-        border-radius: 8px;
+        background: linear-gradient(135deg, {ACCENT}, {ACCENT_HOVER});
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 28px;
         font-weight: 600;
-        transition: all 0.2s;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 16px {ACCENT}30;
+    }}
+    
+    .stButton button:hover {{
+        transform: translateY(-2px);
+        box-shadow: {GLOW}, 0 8px 24px {ACCENT}40;
+    }}
+    
+    .stButton button:active {{
+        transform: translateY(0);
+    }}
+    
+    /* Form Inputs - Modern Design */
+    .stTextInput input, .stTextArea textarea, .stSelectbox select {{
+        background: {CARD_BG};
+        border: 1.5px solid {CARD_BORDER};
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        color: {ROOT_TEXT};
+        transition: all 0.2s ease;
+    }}
+    
+    .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {{
+        border-color: {ACCENT};
+        box-shadow: 0 0 0 3px {ACCENT}15;
+        outline: none;
+    }}
+    
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {{
+        background: {CARD_BG};
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: 1px solid {CARD_BORDER};
+    }}
+    
+    [data-testid="stSidebar"] .stRadio label {{
+        background: {CARD_BG};
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid {CARD_BORDER};
+        margin: 4px 0;
+        transition: all 0.2s ease;
+    }}
+    
+    [data-testid="stSidebar"] .stRadio label:hover {{
+        border-color: {ACCENT};
+        background: {ACCENT}10;
+    }}
+    
+    /* Code Block Styling */
+    .stCodeBlock {{
+        background: {CARD_BG};
+        border: 1px solid {CARD_BORDER};
+        border-radius: 12px;
+        box-shadow: {SHADOW};
+    }}
+    
+    code {{
+        background: {ACCENT}15;
+        color: {ACCENT};
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 0.9em;
+        font-family: 'Monaco', 'Menlo', monospace;
+    }}
+    
+    /* Dataframe Styling */
+    .stDataFrame {{
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: {SHADOW};
+    }}
+    
+    /* Success/Info/Warning Messages */
+    .stSuccess, .stInfo, .stWarning {{
+        border-radius: 12px;
+        border-left: 4px solid {SUCCESS};
+        padding: 16px 20px;
+        backdrop-filter: blur(10px);
+    }}
+    
+    /* Expander Styling */
+    .streamlit-expanderHeader {{
+        background: {CARD_BG};
+        border-radius: 10px;
+        border: 1px solid {CARD_BORDER};
+        padding: 12px 16px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }}
+    
+    .streamlit-expanderHeader:hover {{
+        border-color: {ACCENT};
+        background: {ACCENT}10;
+    }}
+    
+    /* Divider */
+    hr {{
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, {CARD_BORDER}, transparent);
+        margin: 32px 0;
+    }}
+    
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {{
+        width: 10px;
+        height: 10px;
+    }}
+    
+    ::-webkit-scrollbar-track {{
+        background: {ROOT_BG_SOLID};
+    }}
+    
+    ::-webkit-scrollbar-thumb {{
+        background: {ACCENT}40;
+        border-radius: 5px;
+    }}
+    
+    ::-webkit-scrollbar-thumb:hover {{
+        background: {ACCENT}60;
+    }}
+    
+    /* Animations */
+    @keyframes fadeIn {{
+        from {{ opacity: 0; transform: translateY(10px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
+    
+    .stMarkdown, .stButton, .stTextInput {{
+        animation: fadeIn 0.4s ease-out;
+    }}
+    
+    /* Toggle Switch Styling */
+    .stCheckbox {{
+        padding: 8px;
     }}
 </style>
 
 <script>
     // Enable browser password manager
     document.addEventListener('DOMContentLoaded', function() {{
-        // Find password input and add autocomplete
         const inputs = document.querySelectorAll('input[type="password"]');
         inputs.forEach(input => {{
             input.setAttribute('autocomplete', 'current-password');
         }});
         
-        // Find username/user inputs
         const userInputs = document.querySelectorAll('input[aria-label*="User"]');
         userInputs.forEach(input => {{
             input.setAttribute('autocomplete', 'username');
@@ -544,31 +740,38 @@ st.markdown(f"""
 </script>
 """, unsafe_allow_html=True)
 
+
 with col_title:
     st.markdown(f"""
-    <div style="text-align: center; margin-bottom: 30px;">
+    <div style="
+        text-align: center; 
+        margin-bottom: 48px;
+        padding: 32px 24px;
+        animation: fadeIn 0.6s ease-out;
+    ">
         <h1 style="
-            font-size: 3rem;
+            font-size: 2.75rem;
             font-weight: 800;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #6366f1, #3b82f6, #8b5cf6);
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, {ACCENT}, {ACCENT_HOVER});
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
-            filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.2));
+            letter-spacing: -0.03em;
+            line-height: 1.1;
         ">
-            ⚡ Ask Questions. Get Answers. ⚡
+            Ask Questions. Get Answers.
         </h1>
         <div style="
-            font-size: 1.6rem;
+            font-size: 1.1rem;
             font-weight: 400;
-            color: {ROOT_TEXT};
-            opacity: 1.0;
-            max-width: 700px;
+            color: {SECONDARY};
+            max-width: 600px;
             margin: 0 auto;
             line-height: 1.6;
+            letter-spacing: 0.01em;
         ">
-            AI Powered Text to SQL Agentic Assistant.
+            AI-powered natural language to SQL assistant
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -580,12 +783,25 @@ col_left, col_right = st.columns([1, 2], gap="large")
 with col_left:
     with st.container(border=True):
         st.markdown(f"""
-        <div style="margin-bottom: 15px;">
-            <div style="font-size: 1.2rem; font-weight: 700; color: {ACCENT}; display: flex; align-items: center; gap: 8px;">
-                🔎 Database Schema
+        <div style="margin-bottom: 20px;">
+            <div style="
+                font-size: 1.15rem; 
+                font-weight: 700; 
+                color: {ACCENT}; 
+                display: flex; 
+                align-items: center; 
+                gap: 10px;
+                margin-bottom: 8px;
+            ">
+                �️ Database Schema
             </div>
-            <div style="font-size: 0.85rem; color: {ROOT_TEXT}; opacity: 0.65; margin-top: 4px; font-weight: 400;">
-                Select a table to view its schema, then ask your question.
+            <div style="
+                font-size: 0.9rem; 
+                color: {SECONDARY}; 
+                line-height: 1.5;
+                font-weight: 400;
+            ">
+                Browse tables and columns
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -595,7 +811,22 @@ with col_left:
             selected_table = st.selectbox("Select Table", TABLES, label_visibility="collapsed")
             
             if selected_table:
-                st.markdown(f"**Columns in `{selected_table}`**")
+                st.markdown(f"""
+                <div style="
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    color: {ROOT_TEXT};
+                    margin: 20px 0 12px 0;
+                ">
+                    Columns in <code style="
+                        background: {ACCENT}15;
+                        color: {ACCENT};
+                        padding: 3px 8px;
+                        border-radius: 6px;
+                        font-size: 0.9em;
+                    ">{selected_table}</code>
+                </div>
+                """, unsafe_allow_html=True)
                 cols = schema_objects.get(selected_table, [])
                 
                 # Render columns as chips
@@ -609,31 +840,63 @@ with col_left:
 # RIGHT COLUMN: Query Console
 with col_right:
     with st.container(border=True):
-        st.subheader("Ask your question:")
+        st.markdown(f"""
+        <div style="
+            font-size: 1.15rem; 
+            font-weight: 700; 
+            color: {ROOT_TEXT}; 
+            margin-bottom: 20px;
+        ">
+            💬 Ask Your Question
+        </div>
+        """, unsafe_allow_html=True)
         
         question = st.text_area(
-            "Ask a question about your data:", 
-            height=50, 
-            placeholder="e.g., Show me the top 10 users by total spend..."
+            "Type your question in plain English:", 
+            height=80, 
+            placeholder="e.g., Show me the top 10 products by sales...",
+            label_visibility="collapsed"
         )
         
         if st.button("🚀 Generate & Run SQL", type="primary", use_container_width=True):
             if not question.strip():
-                st.warning("Please enter a question first.")
+                st.warning("⚠️ Please enter a question first.")
             else:
-                with st.spinner("Generating SQL..."):
+                with st.spinner("🔮 Generating SQL..."):
                     sql = generate_sql(question)
                 
-                st.markdown("### Generated SQL")
+                st.markdown(f"""
+                <div style="
+                    font-size: 1.05rem;
+                    font-weight: 600;
+                    color: {ROOT_TEXT};
+                    margin: 24px 0 12px 0;
+                ">
+                    📝 Generated SQL
+                </div>
+                """, unsafe_allow_html=True)
                 st.code(sql, language="sql")
                 
-                with st.spinner("Executing query..."):
+                with st.spinner("⚡ Executing query..."):
                     df = run_query(sql)
                 
                 if df.empty:
-                    st.info("Query returned no results.")
+                    st.info("ℹ️ Query returned no results.")
                 else:
-                    st.markdown(f"### Results ({len(df)} rows)")
+                    st.markdown(f"""
+                    <div style="
+                        font-size: 1.05rem;
+                        font-weight: 600;
+                        color: {ROOT_TEXT};
+                        margin: 24px 0 12px 0;
+                    ">
+                        📊 Results <span style="
+                            color: {SECONDARY};
+                            font-weight: 500;
+                            font-size: 0.9rem;
+                        ">({len(df)} rows)</span>
+                    </div>
+                    """, unsafe_allow_html=True)
                     st.dataframe(df, use_container_width=True)
                     
                     # Download CSV
@@ -646,12 +909,30 @@ with col_right:
                         key='download-csv'
                     )
 
+
 # Footer
-st.markdown("---")
-st.markdown(
-    f"<div style='text-align: center; color: {ROOT_TEXT}; opacity: 0.5; font-size: 0.9rem;'>"
-    "     AI Data Studio<br>"
-    "ai.data.studio.by@gmail.com"
-    "</div>", 
-    unsafe_allow_html=True
-)
+st.markdown(f"""
+<div style="
+    text-align: center; 
+    margin-top: 64px;
+    padding: 32px 0;
+    border-top: 1px solid {CARD_BORDER};
+">
+    <div style="
+        color: {SECONDARY}; 
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+    ">
+        AI Data Studio
+    </div>
+    <div style="
+        color: {SECONDARY}; 
+        font-size: 0.85rem;
+        opacity: 0.8;
+    ">
+        ai.data.studio.by@gmail.com
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
