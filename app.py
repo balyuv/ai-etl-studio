@@ -1010,7 +1010,7 @@ with st.container():
     st.markdown(f"""
     <div style="
         text-align: center; 
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         padding: 8px 24px;
         animation: fadeInUp 0.8s ease-out;
     ">
