@@ -991,7 +991,7 @@ with st.container():
     st.markdown(f"""
     <div style="
         text-align: center; 
-        margin-bottom: 56px;
+        margin-bottom: 10px;
         padding: 48px 24px;
         animation: fadeInUp 0.8s ease-out;
     ">
