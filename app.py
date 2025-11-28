@@ -476,41 +476,60 @@ with col_toggle:
     dark_mode = st.toggle("🌗", value=True)
 
 if dark_mode:
-    # Modern dark theme - inspired by VS Code, GitHub Dark
-    ROOT_BG = "linear-gradient(135deg, #0d1117 0%, #161b22 100%)"
-    ROOT_BG_SOLID = "#0d1117"
-    ROOT_TEXT = "#e6edf3"
-    CARD_BG = "rgba(22, 27, 34, 0.8)"
-    CARD_BORDER = "rgba(48, 54, 61, 0.5)"
-    ACCENT = "#58a6ff"
-    ACCENT_HOVER = "#79c0ff"
-    SECONDARY = "#8b949e"
-    SUCCESS = "#3fb950"
-    SHADOW = "0 8px 32px rgba(0, 0, 0, 0.4)"
-    GLOW = "0 0 20px rgba(88, 166, 255, 0.3)"
+    # Vibrant dark theme with dramatic effects
+    ROOT_BG = "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%)"
+    ROOT_BG_SOLID = "#0a0e27"
+    ROOT_TEXT = "#ffffff"
+    CARD_BG = "rgba(30, 35, 55, 0.7)"
+    CARD_BORDER = "rgba(88, 166, 255, 0.3)"
+    ACCENT = "#00d4ff"
+    ACCENT_HOVER = "#00f0ff"
+    SECONDARY = "#a0aec0"
+    SUCCESS = "#00ff88"
+    SHADOW = "0 20px 60px rgba(0, 0, 0, 0.6)"
+    GLOW = "0 0 40px rgba(0, 212, 255, 0.5)"
+    GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    GRADIENT_ACCENT = "linear-gradient(135deg, #00d4ff 0%, #0099ff 100%)"
 else:
-    # Modern light theme - inspired by Google Material, Apple Design
-    ROOT_BG = "linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%)"
+    # Vibrant light theme with dramatic effects
+    ROOT_BG = "linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f8f9ff 100%)"
     ROOT_BG_SOLID = "#ffffff"
-    ROOT_TEXT = "#1f2328"
-    CARD_BG = "rgba(255, 255, 255, 0.9)"
-    CARD_BORDER = "rgba(208, 215, 222, 0.5)"
-    ACCENT = "#0969da"
-    ACCENT_HOVER = "#0550ae"
-    SECONDARY = "#656d76"
-    SUCCESS = "#1a7f37"
-    SHADOW = "0 8px 32px rgba(31, 35, 40, 0.12)"
-    GLOW = "0 0 20px rgba(9, 105, 218, 0.2)"
+    ROOT_TEXT = "#1a202c"
+    CARD_BG = "rgba(255, 255, 255, 0.85)"
+    CARD_BORDER = "rgba(102, 126, 234, 0.25)"
+    ACCENT = "#667eea"
+    ACCENT_HOVER = "#5568d3"
+    SECONDARY = "#718096"
+    SUCCESS = "#48bb78"
+    SHADOW = "0 20px 60px rgba(102, 126, 234, 0.25)"
+    GLOW = "0 0 40px rgba(102, 126, 234, 0.4)"
+    GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    GRADIENT_ACCENT = "linear-gradient(135deg, #667eea 0%, #0099ff 100%)"
 
 st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
-    /* Root Styling */
+    /* Animated Background */
     .stApp {{
         background: {ROOT_BG};
         color: {ROOT_TEXT};
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        position: relative;
+    }}
+    
+    .stApp::before {{
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 20% 50%, {ACCENT}08 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, {ACCENT}08 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
     }}
     
     /* Smooth scrolling */
@@ -518,181 +537,226 @@ st.markdown(f"""
         scroll-behavior: smooth;
     }}
     
-    /* Typography Hierarchy */
+    /* Typography with dramatic styling */
     h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {{
         font-family: 'Inter', sans-serif;
-        font-weight: 700;
-        letter-spacing: -0.03em;
+        font-weight: 800;
+        letter-spacing: -0.04em;
         color: {ROOT_TEXT};
-        line-height: 1.2;
+        line-height: 1.1;
+        text-shadow: 0 2px 20px {ACCENT}30;
     }}
     
-    /* Premium Container Styling */
+    /* Premium Glass Cards */
     [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {{
         background: {CARD_BG};
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid {CARD_BORDER};
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: {SHADOW};
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 2px solid {CARD_BORDER};
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: {SHADOW}, inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }}
     
-    /* Glassmorphism Cards */
-    .stContainer {{
-        background: {CARD_BG};
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid {CARD_BORDER};
-        border-radius: 16px;
-        box-shadow: {SHADOW};
+    [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"]::before {{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, {ACCENT}60, transparent);
     }}
     
-    /* Column Chips - Modern Badge Design */
+    [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"]:hover {{
+        transform: translateY(-4px);
+        box-shadow: {GLOW}, {SHADOW};
+        border-color: {ACCENT}60;
+    }}
+    
+    /* Dramatic Column Chips */
     .col-chip {{
         display: inline-flex;
         align-items: center;
-        background: linear-gradient(135deg, {ACCENT}15, {ACCENT}25);
-        color: {ACCENT};
-        border: 1px solid {ACCENT}30;
-        padding: 6px 14px;
-        border-radius: 24px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin: 4px 6px 4px 0;
-        transition: all 0.2s ease;
-        letter-spacing: 0.01em;
+        background: {GRADIENT_ACCENT};
+        color: white;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin: 6px 8px 6px 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        letter-spacing: 0.02em;
+        box-shadow: 0 4px 15px {ACCENT}40;
+        text-transform: uppercase;
+        font-size: 0.75rem;
     }}
     
     .col-chip:hover {{
-        background: linear-gradient(135deg, {ACCENT}25, {ACCENT}35);
-        border-color: {ACCENT}50;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px {ACCENT}20;
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px {ACCENT}60;
     }}
     
-    /* Premium Button Styling */
+    /* Stunning Button Design */
     .stButton button {{
-        background: linear-gradient(135deg, {ACCENT}, {ACCENT_HOVER});
+        background: {GRADIENT_PRIMARY};
         color: white;
         border: none;
-        border-radius: 12px;
-        padding: 12px 28px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        letter-spacing: 0.02em;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 16px {ACCENT}30;
+        border-radius: 16px;
+        padding: 16px 36px;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.03em;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 30px {ACCENT}50, inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+    }}
+    
+    .stButton button::before {{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s;
     }}
     
     .stButton button:hover {{
-        transform: translateY(-2px);
-        box-shadow: {GLOW}, 0 8px 24px {ACCENT}40;
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: {GLOW}, 0 12px 40px {ACCENT}60;
+    }}
+    
+    .stButton button:hover::before {{
+        left: 100%;
     }}
     
     .stButton button:active {{
-        transform: translateY(0);
+        transform: translateY(-2px) scale(1.01);
     }}
     
-    /* Form Inputs - Modern Design */
+    /* Premium Form Inputs */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {{
         background: {CARD_BG};
-        border: 1.5px solid {CARD_BORDER};
-        border-radius: 10px;
-        padding: 12px 16px;
-        font-size: 0.95rem;
+        backdrop-filter: blur(10px);
+        border: 2px solid {CARD_BORDER};
+        border-radius: 14px;
+        padding: 14px 18px;
+        font-size: 1rem;
         color: {ROOT_TEXT};
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     }}
     
     .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {{
         border-color: {ACCENT};
-        box-shadow: 0 0 0 3px {ACCENT}15;
+        box-shadow: 0 0 0 4px {ACCENT}20, {GLOW};
         outline: none;
+        transform: translateY(-2px);
     }}
     
-    /* Sidebar Styling */
+    /* Vibrant Sidebar */
     [data-testid="stSidebar"] {{
         background: {CARD_BG};
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-right: 1px solid {CARD_BORDER};
+        backdrop-filter: blur(30px) saturate(180%);
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        border-right: 2px solid {CARD_BORDER};
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.1);
     }}
     
     [data-testid="stSidebar"] .stRadio label {{
         background: {CARD_BG};
-        padding: 12px 16px;
-        border-radius: 10px;
-        border: 1px solid {CARD_BORDER};
-        margin: 4px 0;
-        transition: all 0.2s ease;
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 2px solid {CARD_BORDER};
+        margin: 6px 0;
+        transition: all 0.3s ease;
+        font-weight: 600;
     }}
     
     [data-testid="stSidebar"] .stRadio label:hover {{
         border-color: {ACCENT};
-        background: {ACCENT}10;
+        background: {ACCENT}15;
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px {ACCENT}30;
     }}
     
-    /* Code Block Styling */
+    /* Dramatic Code Blocks */
     .stCodeBlock {{
         background: {CARD_BG};
-        border: 1px solid {CARD_BORDER};
-        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 2px solid {CARD_BORDER};
+        border-radius: 16px;
         box-shadow: {SHADOW};
+        overflow: hidden;
     }}
     
     code {{
-        background: {ACCENT}15;
-        color: {ACCENT};
-        padding: 3px 8px;
-        border-radius: 6px;
+        background: {GRADIENT_ACCENT};
+        color: white;
+        padding: 4px 10px;
+        border-radius: 8px;
         font-size: 0.9em;
         font-family: 'Monaco', 'Menlo', monospace;
+        font-weight: 600;
+        box-shadow: 0 2px 8px {ACCENT}40;
     }}
     
-    /* Dataframe Styling */
+    /* Premium Dataframe */
     .stDataFrame {{
-        border-radius: 12px;
+        border-radius: 16px;
         overflow: hidden;
         box-shadow: {SHADOW};
+        border: 2px solid {CARD_BORDER};
     }}
     
-    /* Success/Info/Warning Messages */
+    /* Vibrant Messages */
     .stSuccess, .stInfo, .stWarning {{
-        border-radius: 12px;
-        border-left: 4px solid {SUCCESS};
-        padding: 16px 20px;
+        border-radius: 14px;
+        border-left: 5px solid {SUCCESS};
+        padding: 18px 24px;
         backdrop-filter: blur(10px);
+        background: {CARD_BG};
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        font-weight: 500;
     }}
     
-    /* Expander Styling */
+    /* Expander with Glow */
     .streamlit-expanderHeader {{
         background: {CARD_BG};
-        border-radius: 10px;
-        border: 1px solid {CARD_BORDER};
-        padding: 12px 16px;
-        font-weight: 600;
-        transition: all 0.2s ease;
+        border-radius: 12px;
+        border: 2px solid {CARD_BORDER};
+        padding: 14px 18px;
+        font-weight: 700;
+        transition: all 0.3s ease;
     }}
     
     .streamlit-expanderHeader:hover {{
         border-color: {ACCENT};
-        background: {ACCENT}10;
+        background: {ACCENT}15;
+        box-shadow: 0 4px 20px {ACCENT}30;
     }}
     
-    /* Divider */
+    /* Dramatic Divider */
     hr {{
         border: none;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, {CARD_BORDER}, transparent);
-        margin: 32px 0;
+        height: 2px;
+        background: {GRADIENT_ACCENT};
+        margin: 40px 0;
+        border-radius: 2px;
+        box-shadow: 0 2px 15px {ACCENT}40;
     }}
     
-    /* Scrollbar Styling */
+    /* Custom Scrollbar */
     ::-webkit-scrollbar {{
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
     }}
     
     ::-webkit-scrollbar-track {{
@@ -700,27 +764,51 @@ st.markdown(f"""
     }}
     
     ::-webkit-scrollbar-thumb {{
-        background: {ACCENT}40;
-        border-radius: 5px;
+        background: {GRADIENT_ACCENT};
+        border-radius: 6px;
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     }}
     
     ::-webkit-scrollbar-thumb:hover {{
-        background: {ACCENT}60;
+        background: {ACCENT};
     }}
     
-    /* Animations */
-    @keyframes fadeIn {{
-        from {{ opacity: 0; transform: translateY(10px); }}
-        to {{ opacity: 1; transform: translateY(0); }}
+    /* Dramatic Animations */
+    @keyframes fadeInUp {{
+        from {{ 
+            opacity: 0; 
+            transform: translateY(30px);
+        }}
+        to {{ 
+            opacity: 1; 
+            transform: translateY(0);
+        }}
+    }}
+    
+    @keyframes pulse {{
+        0%, 100% {{ opacity: 1; }}
+        50% {{ opacity: 0.8; }}
     }}
     
     .stMarkdown, .stButton, .stTextInput {{
-        animation: fadeIn 0.4s ease-out;
+        animation: fadeInUp 0.6s ease-out;
     }}
     
-    /* Toggle Switch Styling */
+    /* Toggle Switch */
     .stCheckbox {{
-        padding: 8px;
+        padding: 10px;
+    }}
+    
+    /* Download Button Special Styling */
+    .stDownloadButton button {{
+        background: {GRADIENT_ACCENT};
+        border: none;
+        box-shadow: 0 6px 20px {ACCENT}40;
+    }}
+    
+    .stDownloadButton button:hover {{
+        box-shadow: 0 8px 30px {ACCENT}60;
+        transform: translateY(-3px);
     }}
 </style>
 
@@ -745,33 +833,35 @@ with col_title:
     st.markdown(f"""
     <div style="
         text-align: center; 
-        margin-bottom: 48px;
-        padding: 32px 24px;
-        animation: fadeIn 0.6s ease-out;
+        margin-bottom: 56px;
+        padding: 48px 24px;
+        animation: fadeInUp 0.8s ease-out;
     ">
         <h1 style="
-            font-size: 2.75rem;
-            font-weight: 800;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, {ACCENT}, {ACCENT_HOVER});
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: {GRADIENT_PRIMARY};
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            text-shadow: 0 4px 30px {ACCENT}40;
+            filter: drop-shadow(0 0 20px {ACCENT}30);
         ">
-            Ask Questions. Get Answers.
+            ✨ Ask Questions. Get Answers. ✨
         </h1>
         <div style="
-            font-size: 1.1rem;
-            font-weight: 400;
+            font-size: 1.25rem;
+            font-weight: 500;
             color: {SECONDARY};
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
-            line-height: 1.6;
-            letter-spacing: 0.01em;
+            line-height: 1.7;
+            letter-spacing: 0.02em;
         ">
-            AI-powered natural language to SQL assistant
+            Transform natural language into powerful SQL queries instantly
         </div>
     </div>
     """, unsafe_allow_html=True)
