@@ -40,6 +40,42 @@ ENCRYPTION_KEY_FILE = CONFIG_DIR / "test_db.key"
 # Ensure config directory exists
 CONFIG_DIR.mkdir(exist_ok=True)
 
+# 🎨 Premium UI Design System
+with st.sidebar:
+    st.write("")
+    dark_mode = st.toggle("🌗 Dark Mode", value=True)
+
+if dark_mode:
+    # Vibrant dark theme with dramatic effects
+    ROOT_BG = "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%)"
+    ROOT_BG_SOLID = "#0a0e27"
+    ROOT_TEXT = "#ffffff"
+    CARD_BG = "rgba(30, 35, 55, 0.7)"
+    CARD_BORDER = "rgba(88, 166, 255, 0.3)"
+    ACCENT = "#00d4ff"
+    ACCENT_HOVER = "#00f0ff"
+    SECONDARY = "#a0aec0"
+    SUCCESS = "#00ff88"
+    SHADOW = "0 20px 60px rgba(0, 0, 0, 0.6)"
+    GLOW = "0 0 40px rgba(0, 212, 255, 0.5)"
+    GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    GRADIENT_ACCENT = "linear-gradient(135deg, #00d4ff 0%, #0099ff 100%)"
+else:
+    # Vibrant light theme with dramatic effects
+    ROOT_BG = "linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f8f9ff 100%)"
+    ROOT_BG_SOLID = "#ffffff"
+    ROOT_TEXT = "#1a202c"
+    CARD_BG = "rgba(255, 255, 255, 0.85)"
+    CARD_BORDER = "rgba(102, 126, 234, 0.25)"
+    ACCENT = "#667eea"
+    ACCENT_HOVER = "#5568d3"
+    SECONDARY = "#718096"
+    SUCCESS = "#48bb78"
+    SHADOW = "0 20px 60px rgba(102, 126, 234, 0.25)"
+    GLOW = "0 0 40px rgba(102, 126, 234, 0.4)"
+    GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    GRADIENT_ACCENT = "linear-gradient(135deg, #667eea 0%, #0099ff 100%)"
+
 def get_or_create_encryption_key():
     """Get or create encryption key for test database credentials"""
     try:
@@ -604,45 +640,8 @@ def run_query(sql: str) -> pd.DataFrame:
         st.error(f"❌ SQL Execution Failed: {e}")
         return pd.DataFrame()
 
+
 # 🎨 Premium UI Design System
-# Header Layout with Theme Toggle
-col_title, col_toggle = st.columns([7, 1])
-
-with col_toggle:
-    st.write("")
-    st.write("")
-    dark_mode = st.toggle("🌗", value=True)
-
-if dark_mode:
-    # Vibrant dark theme with dramatic effects
-    ROOT_BG = "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%)"
-    ROOT_BG_SOLID = "#0a0e27"
-    ROOT_TEXT = "#ffffff"
-    CARD_BG = "rgba(30, 35, 55, 0.7)"
-    CARD_BORDER = "rgba(88, 166, 255, 0.3)"
-    ACCENT = "#00d4ff"
-    ACCENT_HOVER = "#00f0ff"
-    SECONDARY = "#a0aec0"
-    SUCCESS = "#00ff88"
-    SHADOW = "0 20px 60px rgba(0, 0, 0, 0.6)"
-    GLOW = "0 0 40px rgba(0, 212, 255, 0.5)"
-    GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-    GRADIENT_ACCENT = "linear-gradient(135deg, #00d4ff 0%, #0099ff 100%)"
-else:
-    # Vibrant light theme with dramatic effects
-    ROOT_BG = "linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f8f9ff 100%)"
-    ROOT_BG_SOLID = "#ffffff"
-    ROOT_TEXT = "#1a202c"
-    CARD_BG = "rgba(255, 255, 255, 0.85)"
-    CARD_BORDER = "rgba(102, 126, 234, 0.25)"
-    ACCENT = "#667eea"
-    ACCENT_HOVER = "#5568d3"
-    SECONDARY = "#718096"
-    SUCCESS = "#48bb78"
-    SHADOW = "0 20px 60px rgba(102, 126, 234, 0.25)"
-    GLOW = "0 0 40px rgba(102, 126, 234, 0.4)"
-    GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-    GRADIENT_ACCENT = "linear-gradient(135deg, #667eea 0%, #0099ff 100%)"
 
 st.markdown(f"""
 <style>
@@ -960,7 +959,8 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-with col_title:
+
+with st.container():
     st.markdown(f"""
     <div style="
         text-align: center; 
