@@ -812,7 +812,9 @@ st.markdown(f"""
     [data-testid="stSidebar"] .stRadio label p,
     [data-testid="stSidebar"] .stCheckbox label p,
     [data-testid="stSidebar"] .stCaption,
-    [data-testid="stSidebar"] .stMarkdown p {{
+    [data-testid="stSidebar"] .stMarkdown p,
+    [data-testid="stSidebar"] .streamlit-expanderHeader p,
+    [data-testid="stSidebar"] .streamlit-expanderHeader {{
         color: {ROOT_TEXT} !important;
     }}
     
