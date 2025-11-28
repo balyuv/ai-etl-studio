@@ -814,7 +814,16 @@ st.markdown(f"""
     [data-testid="stSidebar"] .stCaption,
     [data-testid="stSidebar"] .stMarkdown p,
     [data-testid="stSidebar"] .streamlit-expanderHeader p,
-    [data-testid="stSidebar"] .streamlit-expanderHeader {{
+    [data-testid="stSidebar"] .streamlit-expanderHeader,
+    [data-testid="stSidebar"] [data-testid="stExpander"] summary,
+    [data-testid="stSidebar"] [data-testid="stExpander"] summary span,
+    [data-testid="stSidebar"] [data-testid="stExpander"] summary p {{
+        color: {ROOT_TEXT} !important;
+    }}
+    
+    /* Force Expander Icon to be white */
+    [data-testid="stSidebar"] [data-testid="stExpander"] summary svg {{
+        fill: {ROOT_TEXT} !important;
         color: {ROOT_TEXT} !important;
     }}
     
