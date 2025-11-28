@@ -55,7 +55,7 @@ if dark_mode:
     CARD_BORDER = "rgba(88, 166, 255, 0.3)"
     ACCENT = "#00d4ff"
     ACCENT_HOVER = "#00f0ff"
-    SECONDARY = "#e2e8f0" # Much lighter gray for better visibility in dark mode
+    SECONDARY = "#ffffff" # Pure white for maximum visibility
     SUCCESS = "#00ff88"
     SHADOW = "0 20px 60px rgba(0, 0, 0, 0.6)"
     GLOW = "0 0 40px rgba(0, 212, 255, 0.5)"
