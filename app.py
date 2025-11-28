@@ -132,13 +132,52 @@ def clear_saved_credentials():
 
 # 🔌 Sidebar Database Connection
 with st.sidebar:
-    st.header("🔌 Database Connection")
+    # Professional Header
+    st.markdown(f"""
+    <div style="
+        padding: 20px 0 16px 0;
+        border-bottom: 2px solid {CARD_BORDER if 'CARD_BORDER' in dir() else '#e0e0e0'};
+        margin-bottom: 20px;
+    ">
+        <div style="
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: {ACCENT if 'ACCENT' in dir() else '#667eea'};
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        ">
+            <span style="font-size: 1.3rem;">🔌</span>
+            <span>Connection Manager</span>
+        </div>
+        <div style="
+            font-size: 0.85rem;
+            color: {SECONDARY if 'SECONDARY' in dir() else '#718096'};
+            font-weight: 400;
+        ">
+            Configure your database connection
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Connection Mode Selector
+    # Connection Mode Selector with better styling
+    st.markdown("""
+    <div style="
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #4a5568;
+    ">
+        CONNECTION TYPE
+    </div>
+    """, unsafe_allow_html=True)
+    
     connection_mode = st.radio(
         "Connection Mode",
         ["🔐 My Database", "🧪 Test Database"],
-        help="Choose to connect to your own database or use the test database"
+        help="Choose to connect to your own database or use the test database",
+        label_visibility="collapsed"
     )
     
     if connection_mode == "🧪 Test Database":
@@ -225,66 +264,96 @@ with st.sidebar:
         # Get saved values from session state if they exist
         saved_config = st.session_state.get('db_config', {})
         
+        # Professional connection form
+        st.markdown("""
+        <div style="
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 24px 0 16px 0;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+        ">
+            📊 DATABASE SETTINGS
+        </div>
+        """, unsafe_allow_html=True)
+        
         with st.form("db_creds"):
-            st.caption("Enter Database Credentials")
+            # Database Type
             db_type = st.selectbox(
-                "Database Type", 
+                "🗄️ Database Type", 
                 ["PostgreSQL", "MySQL"],
                 index=0 if saved_config.get("type") == "PostgreSQL" else (1 if saved_config.get("type") == "MySQL" else 0)
             )
-            db_host = st.text_input(
-                "Host", 
-                value=saved_config.get("host", "localhost"),
-                help="Database host address",
-                key="host_input"
-            )
-            db_port = st.text_input(
-                "Port", 
-                value=str(saved_config.get("port", "5432" if db_type == "PostgreSQL" else "3306")),
-                help="Database port number",
-                key="port_input"
-            )
-            db_user = st.text_input(
-                "User", 
-                value=saved_config.get("user", "postgres" if db_type == "PostgreSQL" else "root"),
-                help="Database username",
-                key="user_input"
-            )
-            db_pass = st.text_input(
-                "Password", 
-                type="password",
-                value=saved_config.get("password", ""),
-                help="Database password",
-                key="pass_input"
-            )
+            
+            st.markdown("<div style='margin: 16px 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #4a5568;'>CONNECTION DETAILS</div>", unsafe_allow_html=True)
+            
+            # Server Details
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                db_host = st.text_input(
+                    "🌐 Server / Host", 
+                    value=saved_config.get("host", "localhost"),
+                    placeholder="e.g., localhost or db.example.com",
+                    key="host_input"
+                )
+            with col2:
+                db_port = st.text_input(
+                    "🔌 Port", 
+                    value=str(saved_config.get("port", "5432" if db_type == "PostgreSQL" else "3306")),
+                    placeholder="5432",
+                    key="port_input"
+                )
+            
+            # Database Name
             db_name = st.text_input(
-                "Database Name", 
+                "💾 Database Name", 
                 value=saved_config.get("database", "postgres" if db_type == "PostgreSQL" else ""),
-                help="Name of the database to connect to",
+                placeholder="Enter database name",
                 key="db_input"
             )
             
-            # Schema is only relevant for PostgreSQL
+            # Schema (PostgreSQL only)
             if db_type == "PostgreSQL":
                 db_schema = st.text_input(
-                    "Schema", 
+                    "📁 Schema", 
                     value=saved_config.get("schema", "public"),
-                    help="PostgreSQL schema name",
+                    placeholder="public",
                     key="schema_input"
                 )
             else:
                 db_schema = None
             
-            # Remember Me checkbox
+            st.markdown("<div style='margin: 16px 0 8px 0; font-size: 0.85rem; font-weight: 600; color: #4a5568;'>AUTHENTICATION</div>", unsafe_allow_html=True)
+            
+            # Credentials
+            db_user = st.text_input(
+                "👤 Username", 
+                value=saved_config.get("user", "postgres" if db_type == "PostgreSQL" else "root"),
+                placeholder="Enter username",
+                key="user_input"
+            )
+            db_pass = st.text_input(
+                "🔑 Password", 
+                type="password",
+                value=saved_config.get("password", ""),
+                placeholder="Enter password",
+                key="pass_input"
+            )
+            
+            # Remember Me
+            st.markdown("<div style='margin: 16px 0 8px 0;'></div>", unsafe_allow_html=True)
             remember_me = st.checkbox(
                 "💾 Remember credentials on this computer",
                 value=st.session_state.get('remember_me', False),
                 help="Saves credentials to ~/.asksql_credentials.json (base64 encoded)"
             )
+            
+            st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
                 
             col1, col2 = st.columns(2)
             with col1:
-                connect_btn = st.form_submit_button("🔌 Connect", use_container_width=True)
+                connect_btn = st.form_submit_button("✅ Connect", type="primary", use_container_width=True)
             with col2:
                 clear_btn = st.form_submit_button("🗑️ Clear", use_container_width=True)
         
@@ -322,14 +391,84 @@ with st.sidebar:
             st.info("🗑️ Credentials cleared!")
             st.rerun()
     
-    # Show connection status (outside both modes)
+    
+    # Professional Connection Status (outside both modes)
     if 'db_config' in st.session_state:
         cfg = st.session_state['db_config']
-        st.success(f"✅ Connected to **{cfg['type']}** at `{cfg['host']}:{cfg['port']}`")
+        
+        st.markdown("""
+        <div style="
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        ">
+            <div style="
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #4a5568;
+                margin-bottom: 12px;
+            ">
+                CONNECTION STATUS
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Status indicator
+        st.markdown(f"""
+        <div style="
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        ">
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 8px;
+            ">
+                <span style="
+                    font-size: 1.2rem;
+                ">✅</span>
+                <span style="
+                    color: white;
+                    font-weight: 700;
+                    font-size: 0.95rem;
+                ">Connected</span>
+            </div>
+            <div style="
+                color: rgba(255, 255, 255, 0.95);
+                font-size: 0.85rem;
+                line-height: 1.6;
+            ">
+                <div style="margin-bottom: 4px;">
+                    <strong>Type:</strong> {cfg['type']}
+                </div>
+                <div style="margin-bottom: 4px;">
+                    <strong>Server:</strong> {cfg['host']}:{cfg['port']}
+                </div>
+                <div>
+                    <strong>Database:</strong> {cfg.get('database', 'N/A')}
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         
         # Show if credentials are saved
         if CREDS_FILE.exists():
-            st.caption("💾 Credentials saved to disk")
+            st.markdown("""
+            <div style="
+                font-size: 0.8rem;
+                color: #718096;
+                text-align: center;
+                padding: 8px;
+                background: rgba(102, 126, 234, 0.1);
+                border-radius: 8px;
+            ">
+                💾 Credentials saved locally
+            </div>
+            """, unsafe_allow_html=True)
 
 
 
