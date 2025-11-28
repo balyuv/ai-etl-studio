@@ -596,7 +596,7 @@ def generate_sql(nl_text: str) -> str:
     4. Do NOT query information_schema, mysql, or any system tables.
     5. If the user asks to "show tables" or "list tables", respond with: SELECT 'Available tables: {", ".join(TABLES)}' AS tables LIMIT 100
     6. If the user asks for "summary", infer the correct table from the schema.
-    7. Always include LIMIT 100 if not specified.
+    7. Always include LIMIT 1000 if not specified.
     8. No semicolons.
     9. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
     10. CRITICAL: Make sure the columns exist in the tables before using them in the query.
