@@ -277,6 +277,7 @@ def generate_sql(nl_text: str) -> str:
     6. If the user asks for "summary", infer the correct table from the schema.
     7. Always include LIMIT 100 if not specified.
     8. No semicolons.
+    9. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
@@ -292,6 +293,7 @@ def generate_sql(nl_text: str) -> str:
     5. If the user asks for "summary", infer the correct table from the schema.
     6. Always include LIMIT 100 if not specified.
     7. No semicolons.
+    8. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
