@@ -1041,7 +1041,7 @@ with col_left:
                 gap: 10px;
                 margin-bottom: 8px;
             ">
-                �️ Database Schema
+                🗄️ Database Schema
             </div>
             <div style="
                 font-size: 0.9rem; 
@@ -1095,7 +1095,7 @@ with col_right:
             color: {ROOT_TEXT}; 
             margin-bottom: 20px;
         ">
-            💬 Ask Your Question
+            🤖 Ask Your Agent
         </div>
         """, unsafe_allow_html=True)
         
