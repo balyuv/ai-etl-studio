@@ -992,7 +992,7 @@ with col_title:
             line-height: 1.7;
             letter-spacing: 0.02em;
         ">
-            Transform natural language into powerful SQL queries instantly
+            Transform natural language into powerful SQL queries instantly with our AI Agent
         </div>
     </div>
     """, unsafe_allow_html=True)
