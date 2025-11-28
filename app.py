@@ -149,21 +149,21 @@ with st.sidebar:
             # Test database is configured
             st.session_state['db_config'] = test_db_config
             st.success("✅ Connected to Test Database")
-            st.info(f"**Type:** {test_db_config['type']}\n\n**Host:** {test_db_config['host']}")
+            st.info(f"**Type:** {test_db_config['type']}\\n\\n**Host:** {test_db_config['host']}")
             
             # Admin option to reconfigure test database
             with st.expander("🔧 Admin: Reconfigure Test Database"):
                 st.caption("⚠️ This will update the test database credentials for all users")
-                with st.form("test_db_setup"):
-                    test_db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL"])
-                    test_db_host = st.text_input("Host", value=test_db_config.get("host", ""))
-                    test_db_port = st.text_input("Port", value=str(test_db_config.get("port", "")))
-                    test_db_user = st.text_input("User", value=test_db_config.get("user", ""))
-                    test_db_pass = st.text_input("Password", type="password")
-                    test_db_name = st.text_input("Database Name", value=test_db_config.get("database", ""))
+                with st.form("test_db_reconfig_form"):
+                    test_db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL"], key="reconfig_type")
+                    test_db_host = st.text_input("Host", value=test_db_config.get("host", ""), key="reconfig_host")
+                    test_db_port = st.text_input("Port", value=str(test_db_config.get("port", "")), key="reconfig_port")
+                    test_db_user = st.text_input("User", value=test_db_config.get("user", ""), key="reconfig_user")
+                    test_db_pass = st.text_input("Password", type="password", key="reconfig_pass")
+                    test_db_name = st.text_input("Database Name", value=test_db_config.get("database", ""), key="reconfig_name")
                     
                     if test_db_type == "PostgreSQL":
-                        test_db_schema = st.text_input("Schema", value=test_db_config.get("schema", "public"))
+                        test_db_schema = st.text_input("Schema", value=test_db_config.get("schema", "public"), key="reconfig_schema")
                     else:
                         test_db_schema = None
                     
@@ -180,23 +180,22 @@ with st.sidebar:
                         if save_test_db_credentials(new_config):
                             st.session_state['db_config'] = new_config
                             st.success("✅ Test database updated!")
-                            st.rerun()
         else:
             # Test database not configured - show setup form
             st.warning("⚠️ Test database not configured")
             st.caption("Admin: Set up the test database credentials below")
             
-            with st.form("test_db_setup"):
+            with st.form("test_db_initial_setup_form"):
                 st.caption("Configure Test Database (Encrypted Storage)")
-                test_db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL"])
-                test_db_host = st.text_input("Host", value="localhost")
-                test_db_port = st.text_input("Port", value="5432" if test_db_type == "PostgreSQL" else "3306")
-                test_db_user = st.text_input("User", value="postgres" if test_db_type == "PostgreSQL" else "root")
-                test_db_pass = st.text_input("Password", type="password")
-                test_db_name = st.text_input("Database Name")
+                test_db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL"], key="initial_type")
+                test_db_host = st.text_input("Host", value="localhost", key="initial_host")
+                test_db_port = st.text_input("Port", value="5432" if test_db_type == "PostgreSQL" else "3306", key="initial_port")
+                test_db_user = st.text_input("User", value="postgres" if test_db_type == "PostgreSQL" else "root", key="initial_user")
+                test_db_pass = st.text_input("Password", type="password", key="initial_pass")
+                test_db_name = st.text_input("Database Name", key="initial_name")
                 
                 if test_db_type == "PostgreSQL":
-                    test_db_schema = st.text_input("Schema", value="public")
+                    test_db_schema = st.text_input("Schema", value="public", key="initial_schema")
                 else:
                     test_db_schema = None
                 
@@ -213,7 +212,7 @@ with st.sidebar:
                     if save_test_db_credentials(config):
                         st.session_state['db_config'] = config
                         st.success("✅ Test database configured!")
-                        st.rerun()
+
     
     else:  # My Database mode
         # Load saved credentials from file if not in session
