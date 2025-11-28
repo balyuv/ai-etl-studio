@@ -409,7 +409,7 @@ with col_title:
             display: inline-block;
             filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.2));
         ">
-            ⚡ AskSQL Console
+            ⚡ Talk to SQL Console
         </h1>
         <div style="
             font-size: 1.1rem;
@@ -420,7 +420,7 @@ with col_title:
             margin: 0 auto;
             line-height: 1.6;
         ">
-            Transform natural language into SQL queries instantly.
+            "Ask in words. Run in SQL.
         </div>
     </div>
     """, unsafe_allow_html=True)
