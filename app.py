@@ -613,7 +613,7 @@ with col_right:
         
         question = st.text_area(
             "Ask a question about your data:", 
-            height=100, 
+            height=50, 
             placeholder="e.g., Show me the top 10 users by total spend..."
         )
         
@@ -650,7 +650,8 @@ with col_right:
 st.markdown("---")
 st.markdown(
     f"<div style='text-align: center; color: {ROOT_TEXT}; opacity: 0.5; font-size: 0.9rem;'>"
-    "Built with ❤️ by Balaji Yuvarajan :-) "
+    "(c) AI ETL Data Studio"
+    "ai.data.studio.by@gmail.com"
     "</div>", 
     unsafe_allow_html=True
 )
