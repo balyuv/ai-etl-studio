@@ -650,8 +650,8 @@ st.markdown(
     <style>
     /* Remove default top spacing from Streamlit */
     .block-container {
-        padding-top: 0rem !important;
-        margin-top: 0rem !important;
+        padding-top: 2rem !important;
+        margin-top: 2rem !important;
     }
 
     /* Optional: Pull the first element even higher */
