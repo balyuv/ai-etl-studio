@@ -650,7 +650,7 @@ with col_right:
 st.markdown("---")
 st.markdown(
     f"<div style='text-align: center; color: {ROOT_TEXT}; opacity: 0.5; font-size: 0.9rem;'>"
-    "  (c) AI ETL Data Studio<br>"
+    "     AI Data Studio<br>"
     "ai.data.studio.by@gmail.com"
     "</div>", 
     unsafe_allow_html=True
