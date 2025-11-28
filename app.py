@@ -609,7 +609,7 @@ with col_left:
 # RIGHT COLUMN: Query Console
 with col_right:
     with st.container(border=True):
-        st.subheader("🧠 SQL Generator")
+        st.subheader("Ask you question")
         
         question = st.text_area(
             "Ask a question about your data:", 
