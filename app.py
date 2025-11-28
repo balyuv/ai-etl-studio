@@ -1092,7 +1092,7 @@ with col_right:
         <div style="
             font-size: 1.15rem; 
             font-weight: 700; 
-            color: {CARD_BG}; 
+            color: {ROOT_TEXT}; 
             margin-bottom: 20px;
         ">
             💬 Ask Your Question
