@@ -992,7 +992,7 @@ with st.container():
     <div style="
         text-align: center; 
         margin-bottom: 10px;
-        padding: 48px 24px;
+        padding: 18px 24px;
         animation: fadeInUp 0.8s ease-out;
     ">
         <h1 style="
