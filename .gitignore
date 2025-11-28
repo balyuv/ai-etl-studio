@@ -15,3 +15,6 @@ db_config.json
 
 # OS
 .DS_Store
+
+# Note: .config/ directory IS tracked (contains encrypted test DB credentials)
+# This is intentional - test database credentials are meant to be shared

@@ -9,6 +9,7 @@ import psycopg2
 import mysql.connector
 from openai import OpenAI
 from dotenv import load_dotenv
+from cryptography.fernet import Fernet
 
 # ⚡ Page config must be first
 st.set_page_config(
@@ -27,7 +28,68 @@ if not OPENAI_KEY:
 client = OpenAI(api_key=OPENAI_KEY)
 
 # 💾 Credential persistence helpers
+# Personal credentials stored in home directory (not committed to git)
 CREDS_FILE = Path.home() / ".asksql_credentials.json"
+
+# Test database credentials stored in project directory (can be committed to git)
+PROJECT_DIR = Path(__file__).parent
+CONFIG_DIR = PROJECT_DIR / ".config"
+TEST_DB_FILE = CONFIG_DIR / "test_db.enc"
+ENCRYPTION_KEY_FILE = CONFIG_DIR / "test_db.key"
+
+# Ensure config directory exists
+CONFIG_DIR.mkdir(exist_ok=True)
+
+def get_or_create_encryption_key():
+    """Get or create encryption key for test database credentials"""
+    try:
+        if ENCRYPTION_KEY_FILE.exists():
+            with open(ENCRYPTION_KEY_FILE, 'rb') as f:
+                return f.read()
+        else:
+            key = Fernet.generate_key()
+            with open(ENCRYPTION_KEY_FILE, 'wb') as f:
+                f.write(key)
+            return key
+    except Exception as e:
+        st.error(f"Failed to manage encryption key: {e}")
+        return None
+
+def save_test_db_credentials(config):
+    """Save test database credentials with encryption"""
+    try:
+        key = get_or_create_encryption_key()
+        if not key:
+            return False
+        
+        fernet = Fernet(key)
+        encrypted_data = fernet.encrypt(json.dumps(config).encode())
+        
+        with open(TEST_DB_FILE, 'wb') as f:
+            f.write(encrypted_data)
+        return True
+    except Exception as e:
+        st.error(f"Failed to save test database credentials: {e}")
+        return False
+
+def load_test_db_credentials():
+    """Load encrypted test database credentials"""
+    try:
+        if not TEST_DB_FILE.exists():
+            return None
+        
+        key = get_or_create_encryption_key()
+        if not key:
+            return None
+        
+        fernet = Fernet(key)
+        with open(TEST_DB_FILE, 'rb') as f:
+            encrypted_data = f.read()
+        
+        decrypted_data = fernet.decrypt(encrypted_data)
+        return json.loads(decrypted_data.decode())
+    except Exception as e:
+        return None
 
 def save_credentials(config):
     """Save credentials to local file (base64 encoded for basic obfuscation)"""
@@ -72,114 +134,196 @@ def clear_saved_credentials():
 with st.sidebar:
     st.header("🔌 Database Connection")
     
-    # Load saved credentials from file if not in session
-    if 'db_config' not in st.session_state:
-        loaded_config = load_credentials()
-        if loaded_config:
-            st.session_state['db_config'] = loaded_config
-            st.session_state['remember_me'] = True
+    # Connection Mode Selector
+    connection_mode = st.radio(
+        "Connection Mode",
+        ["🔐 My Database", "🧪 Test Database"],
+        help="Choose to connect to your own database or use the test database"
+    )
     
-    # Get saved values from session state if they exist
-    saved_config = st.session_state.get('db_config', {})
-    
-    with st.form("db_creds"):
-        st.caption("Enter Database Credentials")
-        db_type = st.selectbox(
-            "Database Type", 
-            ["PostgreSQL", "MySQL"],
-            index=0 if saved_config.get("type") == "PostgreSQL" else (1 if saved_config.get("type") == "MySQL" else 0)
-        )
-        db_host = st.text_input(
-            "Host", 
-            value=saved_config.get("host", "localhost"),
-            help="Database host address",
-            key="host_input"
-        )
-        db_port = st.text_input(
-            "Port", 
-            value=str(saved_config.get("port", "5432" if db_type == "PostgreSQL" else "3306")),
-            help="Database port number",
-            key="port_input"
-        )
-        db_user = st.text_input(
-            "User", 
-            value=saved_config.get("user", "postgres" if db_type == "PostgreSQL" else "root"),
-            help="Database username",
-            key="user_input"
-        )
-        db_pass = st.text_input(
-            "Password", 
-            type="password",
-            value=saved_config.get("password", ""),
-            help="Database password",
-            key="pass_input"
-        )
-        db_name = st.text_input(
-            "Database Name", 
-            value=saved_config.get("database", "postgres" if db_type == "PostgreSQL" else ""),
-            help="Name of the database to connect to",
-            key="db_input"
-        )
+    if connection_mode == "🧪 Test Database":
+        # Try to load test database credentials
+        test_db_config = load_test_db_credentials()
         
-        # Schema is only relevant for PostgreSQL
-        if db_type == "PostgreSQL":
-            db_schema = st.text_input(
-                "Schema", 
-                value=saved_config.get("schema", "public"),
-                help="PostgreSQL schema name",
-                key="schema_input"
-            )
-        else:
-            db_schema = None
-        
-        # Remember Me checkbox
-        remember_me = st.checkbox(
-            "💾 Remember credentials on this computer",
-            value=st.session_state.get('remember_me', False),
-            help="Saves credentials to ~/.asksql_credentials.json (base64 encoded)"
-        )
+        if test_db_config:
+            # Test database is configured
+            st.session_state['db_config'] = test_db_config
+            st.success("✅ Connected to Test Database")
+            st.info(f"**Type:** {test_db_config['type']}\n\n**Host:** {test_db_config['host']}")
             
-        col1, col2 = st.columns(2)
-        with col1:
-            connect_btn = st.form_submit_button("🔌 Connect", use_container_width=True)
-        with col2:
-            clear_btn = st.form_submit_button("🗑️ Clear", use_container_width=True)
-    
-    if connect_btn:
-        # Save to session state
-        st.session_state['db_config'] = {
-            "type": db_type,
-            "host": db_host, "port": db_port, "user": db_user, 
-            "password": db_pass, "database": db_name, "schema": db_schema
-        }
-        st.session_state['remember_me'] = remember_me
-        
-        # Save to file if Remember Me is checked
-        if remember_me:
-            if save_credentials(st.session_state['db_config']):
-                st.success("✅ Connected & credentials saved!")
-            else:
-                st.success("✅ Connected!")
+            # Admin option to reconfigure test database
+            with st.expander("🔧 Admin: Reconfigure Test Database"):
+                st.caption("⚠️ This will update the test database credentials for all users")
+                with st.form("test_db_setup"):
+                    test_db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL"])
+                    test_db_host = st.text_input("Host", value=test_db_config.get("host", ""))
+                    test_db_port = st.text_input("Port", value=str(test_db_config.get("port", "")))
+                    test_db_user = st.text_input("User", value=test_db_config.get("user", ""))
+                    test_db_pass = st.text_input("Password", type="password")
+                    test_db_name = st.text_input("Database Name", value=test_db_config.get("database", ""))
+                    
+                    if test_db_type == "PostgreSQL":
+                        test_db_schema = st.text_input("Schema", value=test_db_config.get("schema", "public"))
+                    else:
+                        test_db_schema = None
+                    
+                    if st.form_submit_button("💾 Update Test Database", use_container_width=True):
+                        new_config = {
+                            "type": test_db_type,
+                            "host": test_db_host,
+                            "port": test_db_port,
+                            "user": test_db_user,
+                            "password": test_db_pass,
+                            "database": test_db_name,
+                            "schema": test_db_schema
+                        }
+                        if save_test_db_credentials(new_config):
+                            st.session_state['db_config'] = new_config
+                            st.success("✅ Test database updated!")
+                            st.rerun()
         else:
-            # Clear saved file if Remember Me is unchecked
+            # Test database not configured - show setup form
+            st.warning("⚠️ Test database not configured")
+            st.caption("Admin: Set up the test database credentials below")
+            
+            with st.form("test_db_setup"):
+                st.caption("Configure Test Database (Encrypted Storage)")
+                test_db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL"])
+                test_db_host = st.text_input("Host", value="localhost")
+                test_db_port = st.text_input("Port", value="5432" if test_db_type == "PostgreSQL" else "3306")
+                test_db_user = st.text_input("User", value="postgres" if test_db_type == "PostgreSQL" else "root")
+                test_db_pass = st.text_input("Password", type="password")
+                test_db_name = st.text_input("Database Name")
+                
+                if test_db_type == "PostgreSQL":
+                    test_db_schema = st.text_input("Schema", value="public")
+                else:
+                    test_db_schema = None
+                
+                if st.form_submit_button("💾 Save Test Database", use_container_width=True):
+                    config = {
+                        "type": test_db_type,
+                        "host": test_db_host,
+                        "port": test_db_port,
+                        "user": test_db_user,
+                        "password": test_db_pass,
+                        "database": test_db_name,
+                        "schema": test_db_schema
+                    }
+                    if save_test_db_credentials(config):
+                        st.session_state['db_config'] = config
+                        st.success("✅ Test database configured!")
+                        st.rerun()
+    
+    else:  # My Database mode
+        # Load saved credentials from file if not in session
+        if 'db_config' not in st.session_state:
+            loaded_config = load_credentials()
+            if loaded_config:
+                st.session_state['db_config'] = loaded_config
+                st.session_state['remember_me'] = True
+        
+        # Get saved values from session state if they exist
+        saved_config = st.session_state.get('db_config', {})
+        
+        with st.form("db_creds"):
+            st.caption("Enter Database Credentials")
+            db_type = st.selectbox(
+                "Database Type", 
+                ["PostgreSQL", "MySQL"],
+                index=0 if saved_config.get("type") == "PostgreSQL" else (1 if saved_config.get("type") == "MySQL" else 0)
+            )
+            db_host = st.text_input(
+                "Host", 
+                value=saved_config.get("host", "localhost"),
+                help="Database host address",
+                key="host_input"
+            )
+            db_port = st.text_input(
+                "Port", 
+                value=str(saved_config.get("port", "5432" if db_type == "PostgreSQL" else "3306")),
+                help="Database port number",
+                key="port_input"
+            )
+            db_user = st.text_input(
+                "User", 
+                value=saved_config.get("user", "postgres" if db_type == "PostgreSQL" else "root"),
+                help="Database username",
+                key="user_input"
+            )
+            db_pass = st.text_input(
+                "Password", 
+                type="password",
+                value=saved_config.get("password", ""),
+                help="Database password",
+                key="pass_input"
+            )
+            db_name = st.text_input(
+                "Database Name", 
+                value=saved_config.get("database", "postgres" if db_type == "PostgreSQL" else ""),
+                help="Name of the database to connect to",
+                key="db_input"
+            )
+            
+            # Schema is only relevant for PostgreSQL
+            if db_type == "PostgreSQL":
+                db_schema = st.text_input(
+                    "Schema", 
+                    value=saved_config.get("schema", "public"),
+                    help="PostgreSQL schema name",
+                    key="schema_input"
+                )
+            else:
+                db_schema = None
+            
+            # Remember Me checkbox
+            remember_me = st.checkbox(
+                "💾 Remember credentials on this computer",
+                value=st.session_state.get('remember_me', False),
+                help="Saves credentials to ~/.asksql_credentials.json (base64 encoded)"
+            )
+                
+            col1, col2 = st.columns(2)
+            with col1:
+                connect_btn = st.form_submit_button("🔌 Connect", use_container_width=True)
+            with col2:
+                clear_btn = st.form_submit_button("🗑️ Clear", use_container_width=True)
+        
+        if connect_btn:
+            # Save to session state
+            st.session_state['db_config'] = {
+                "type": db_type,
+                "host": db_host, "port": db_port, "user": db_user, 
+                "password": db_pass, "database": db_name, "schema": db_schema
+            }
+            st.session_state['remember_me'] = remember_me
+            
+            # Save to file if Remember Me is checked
+            if remember_me:
+                if save_credentials(st.session_state['db_config']):
+                    st.success("✅ Connected & credentials saved!")
+                else:
+                    st.success("✅ Connected!")
+            else:
+                # Clear saved file if Remember Me is unchecked
+                clear_saved_credentials()
+                st.success("✅ Connected!")
+            
+            st.rerun()
+        
+        if clear_btn:
+            # Clear session state
+            if 'db_config' in st.session_state:
+                del st.session_state['db_config']
+            if 'remember_me' in st.session_state:
+                del st.session_state['remember_me']
+            
+            # Clear saved file
             clear_saved_credentials()
-            st.success("✅ Connected!")
-        
-        st.rerun()
+            st.info("🗑️ Credentials cleared!")
+            st.rerun()
     
-    if clear_btn:
-        # Clear session state
-        if 'db_config' in st.session_state:
-            del st.session_state['db_config']
-        if 'remember_me' in st.session_state:
-            del st.session_state['remember_me']
-        
-        # Clear saved file
-        clear_saved_credentials()
-        st.info("🗑️ Credentials cleared!")
-        st.rerun()
-    
-    # Show connection status
+    # Show connection status (outside both modes)
     if 'db_config' in st.session_state:
         cfg = st.session_state['db_config']
         st.success(f"✅ Connected to **{cfg['type']}** at `{cfg['host']}:{cfg['port']}`")
@@ -187,6 +331,7 @@ with st.sidebar:
         # Show if credentials are saved
         if CREDS_FILE.exists():
             st.caption("💾 Credentials saved to disk")
+
 
 
 if 'db_config' not in st.session_state:
