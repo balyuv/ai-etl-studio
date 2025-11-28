@@ -807,6 +807,14 @@ st.markdown(f"""
         border-right: 2px solid {CARD_BORDER};
         box-shadow: 4px 0 30px rgba(0, 0, 0, 0.1);
     }}
+
+    /* Force Sidebar Text Colors */
+    [data-testid="stSidebar"] .stRadio label p,
+    [data-testid="stSidebar"] .stCheckbox label p,
+    [data-testid="stSidebar"] .stCaption,
+    [data-testid="stSidebar"] .stMarkdown p {{
+        color: {ROOT_TEXT} !important;
+    }}
     
     [data-testid="stSidebar"] .stRadio label {{
         background: {INPUT_BG};
