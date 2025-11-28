@@ -409,18 +409,18 @@ with col_title:
             display: inline-block;
             filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.2));
         ">
-            ⚡ Talk to SQL Console
+            ⚡ Talk to SQL Console ⚡
         </h1>
         <div style="
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 1.6rem;
+            font-weight: 400;
             color: {ROOT_TEXT};
-            opacity: 0.8;
+            opacity: 1.0;
             max-width: 700px;
             margin: 0 auto;
             line-height: 1.6;
         ">
-            "Ask in words. Run in SQL.
+            Ask in words. Run in SQL.
         </div>
     </div>
     """, unsafe_allow_html=True)
