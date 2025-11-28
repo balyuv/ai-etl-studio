@@ -645,6 +645,25 @@ def run_query(sql: str) -> pd.DataFrame:
 
 # 🎨 Premium UI Design System
 
+st.markdown(
+    """
+    <style>
+    /* Remove default top spacing from Streamlit */
+    .block-container {
+        padding-top: 0rem !important;
+        margin-top: 0rem !important;
+    }
+
+    /* Optional: Pull the first element even higher */
+    div[data-testid="stVerticalBlock"] > div:first-child {
+        margin-top: -10px !important; /* adjust as needed */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
