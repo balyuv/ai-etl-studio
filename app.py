@@ -1017,7 +1017,7 @@ with st.container():
         <h1 style="
             font-size: 3.5rem;
             font-weight: 900;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             background: {GRADIENT_PRIMARY};
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
