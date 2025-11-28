@@ -773,6 +773,12 @@ st.markdown(f"""
         transform: translateY(-2px) scale(1.01);
     }}
     
+    /* Input Labels */
+    .stTextInput label, .stSelectbox label, .stNumberInput label, .stCheckbox label {
+        color: {ROOT_TEXT} !important;
+        font-weight: 600;
+    }
+
     /* Premium Form Inputs */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {{
         background: {INPUT_BG};
