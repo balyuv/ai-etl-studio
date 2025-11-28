@@ -1095,7 +1095,7 @@ with col_right:
             color: {ROOT_TEXT}; 
             margin-bottom: 20px;
         ">
-            🤖 Ask Your Agent
+            ⚡ Ask Your Question:
         </div>
         """, unsafe_allow_html=True)
         
