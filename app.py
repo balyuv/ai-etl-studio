@@ -335,7 +335,7 @@ with st.sidebar:
 
 
 if 'db_config' not in st.session_state:
-    st.info("👈 Please enter your database credentials in the sidebar to get started.")
+    st.info("👈 Please enter your database credentials or use the Test Database in the sidebar to get started.")
     st.stop()
 
 # Load config from session state
@@ -423,6 +423,7 @@ def generate_sql(nl_text: str) -> str:
     7. Always include LIMIT 100 if not specified.
     8. No semicolons.
     9. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
+    10. CRITICAL: Make sure the columns exist in the tables before using them in the query.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
@@ -556,7 +557,7 @@ with col_title:
             display: inline-block;
             filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.2));
         ">
-            ⚡ Talk to SQL Console ⚡
+            ⚡ Ask Questions. Get Answers. ⚡
         </h1>
         <div style="
             font-size: 1.6rem;
@@ -567,7 +568,7 @@ with col_title:
             margin: 0 auto;
             line-height: 1.6;
         ">
-            Ask in words. Run in SQL.
+            AI Powered Text to SQL Agentic Assistant.
         </div>
     </div>
     """, unsafe_allow_html=True)
