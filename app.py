@@ -509,26 +509,11 @@ st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
-    /* Animated Background */
+    /* Root Styling */
     .stApp {{
         background: {ROOT_BG};
         color: {ROOT_TEXT};
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        position: relative;
-    }}
-    
-    .stApp::before {{
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: 
-            radial-gradient(circle at 20% 50%, {ACCENT}08 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, {ACCENT}08 0%, transparent 50%);
-        pointer-events: none;
-        z-index: 0;
     }}
     
     /* Smooth scrolling */
@@ -558,6 +543,7 @@ st.markdown(f"""
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
+        z-index: 1;
     }}
     
     [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"]::before {{
@@ -568,12 +554,19 @@ st.markdown(f"""
         right: 0;
         height: 1px;
         background: linear-gradient(90deg, transparent, {ACCENT}60, transparent);
+        z-index: 2;
     }}
     
     [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"]:hover {{
         transform: translateY(-4px);
         box-shadow: {GLOW}, {SHADOW};
         border-color: {ACCENT}60;
+    }}
+    
+    /* Ensure main content is visible */
+    [data-testid="stVerticalBlock"] {{
+        position: relative;
+        z-index: 1;
     }}
     
     /* Dramatic Column Chips */
