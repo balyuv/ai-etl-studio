@@ -619,6 +619,7 @@ def generate_sql(nl_text: str) -> str:
         WRONG: Joining directly to sales.
     14. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     15. **Table 'shipment'**: Does NOT have `supplier_id`. Do NOT join shipment to supplier.
+    16. **Table sales does not have name, it has store_id, to join with the store table use store_id**
 
     COMPLEX REQUEST HANDLING (MySQL 5.7 Compatibility):
     17. **RFM Analysis**: Since `NTILE()` is not supported, calculate RAW values only:
