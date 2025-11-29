@@ -618,15 +618,16 @@ def generate_sql(nl_text: str) -> str:
         WRONG: Joining directly to sales.
     14. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     15. **Table 'shipment'**: Does NOT have `supplier_id`. Do NOT join shipment to supplier.
+    16. **Table 'region'**: DOES NOT EXIST. `region` is a column in the `store` table. Do NOT join a region table.
 
     COMPLEX REQUEST HANDLING (MySQL 5.7 Compatibility):
-    16. **RFM Analysis**: Since `NTILE()` is not supported, calculate RAW values only:
+    17. **RFM Analysis**: Since `NTILE()` is not supported, calculate RAW values only:
         - Recency: `DATEDIFF(CURDATE(), MAX(s.sold_date))`
         - Frequency: `COUNT(DISTINCT s.order_id)`
         - Monetary: `SUM(s.sold_price)`
         Do NOT attempt to calculate 1-5 scores.
-    17. **"Top Customers" / Ranking**: Since `RANK()`/`ROW_NUMBER()` are not supported, just ORDER BY the metric and LIMIT. Do not try to partition by store.
-    18. **SLA Calculations**:
+    18. **"Top Customers" / Ranking**: Since `RANK()`/`ROW_NUMBER()` are not supported, just ORDER BY the metric and LIMIT. Do not try to partition by store.
+    19. **SLA Calculations**:
         - **Supplier SLA**: Use `restock_order`. (e.g. `restock_order.status = 'Received'`)
         - **Shipment/Delivery SLA**: Use `shipment`. (e.g. `DATEDIFF(sh.delivery_date, sh.expected_date)`)
     """
@@ -654,6 +655,7 @@ def generate_sql(nl_text: str) -> str:
         CORRECT: `JOIN purchase_order po ON s.order_id = po.order_id JOIN promotion p ON po.promo_id = p.promo_id`
         WRONG: Joining directly to sales.
     9. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
+    10. **Table 'region'**: DOES NOT EXIST. `region` is a column in the `store` table. Do NOT join a region table.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
