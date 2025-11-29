@@ -602,6 +602,7 @@ def generate_sql(nl_text: str) -> str:
     8. No semicolons.
     9. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
     10. CRITICAL: Make sure the columns exist in the tables before using them in the query.
+    11. CRITICAL: MySQL does NOT support PERCENTILE_CONT, PERCENTILE_DISC, or WITHIN GROUP. For percentiles, use subqueries with ORDER BY and LIMIT, or calculate manually with variables.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
