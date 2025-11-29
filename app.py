@@ -612,7 +612,9 @@ def generate_sql(nl_text: str) -> str:
         NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
     13. CRITICAL: ABSOLUTELY NO Common Table Expressions (WITH ... AS). Your MySQL version DOES NOT SUPPORT THEM. You MUST use nested subqueries or derived tables for ALL intermediate steps.
     14. CRITICAL: Table 'returns' DOES NOT EXIST. The correct table name is 'return_order'. NEVER use 'returns'.
-    15. CRITICAL: 'loyalty_tier' table does NOT have 'customer_id'. To get loyalty info, you MUST join: sales -> customer -> loyalty_tier.
+    15. CRITICAL: 'loyalty_tier' table join MUST use 'loyalty_tier_id'. Do NOT use 'tier_id' or 'segment_id'.
+        Correct: JOIN loyalty_tier ON customer.loyalty_tier_id = loyalty_tier.loyalty_tier_id
+        Incorrect: JOIN loyalty_tier ON customer.segment_id = loyalty_tier.tier_id
     16. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
         (e.g., JOIN purchase_order ON sales.order_id = purchase_order.order_id JOIN promotion ON purchase_order.promo_id = promotion.promo_id)
     17. CRITICAL: Use UNIQUE table aliases. Do NOT use the same alias (like 'c') for different tables (e.g., 'customer' and 'category'). Use distinct aliases like 'cust' and 'cat'.
@@ -637,7 +639,7 @@ def generate_sql(nl_text: str) -> str:
         b) Use column aliases (e.g., product.category_id AS product_category_id, category.category_id AS category_category_id)
         NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
     10. CRITICAL: Use EXACT table names from the schema. Do NOT hallucinate table names (e.g., use 'return_order', NOT 'returns').
-    11. CRITICAL: 'loyalty_tier' table does NOT have 'customer_id'. To get loyalty info, you MUST join: sales -> customer -> loyalty_tier.
+    11. CRITICAL: 'loyalty_tier' table join MUST use 'loyalty_tier_id'. Do NOT use 'tier_id' or 'segment_id'.
     12. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
     13. CRITICAL: Use UNIQUE table aliases. Do NOT use the same alias (like 'c') for different tables. Use distinct aliases like 'cust' and 'cat'.
     """
