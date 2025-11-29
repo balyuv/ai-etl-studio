@@ -613,7 +613,8 @@ def generate_sql(nl_text: str) -> str:
     13. CRITICAL: ABSOLUTELY NO Common Table Expressions (WITH ... AS). Your MySQL version DOES NOT SUPPORT THEM. You MUST use nested subqueries or derived tables for ALL intermediate steps.
     14. CRITICAL: Table 'returns' DOES NOT EXIST. The correct table name is 'return_order'. NEVER use 'returns'.
     15. CRITICAL: 'loyalty_tier' table does NOT have 'customer_id'. To get loyalty info, you MUST join: sales -> customer -> loyalty_tier.
-        (e.g., JOIN customer ON sales.customer_id = customer.customer_id JOIN loyalty_tier ON customer.loyalty_tier_id = loyalty_tier.loyalty_tier_id)
+    16. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
+        (e.g., JOIN purchase_order ON sales.order_id = purchase_order.order_id JOIN promotion ON purchase_order.promo_id = promotion.promo_id)
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
@@ -636,6 +637,7 @@ def generate_sql(nl_text: str) -> str:
         NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
     10. CRITICAL: Use EXACT table names from the schema. Do NOT hallucinate table names (e.g., use 'return_order', NOT 'returns').
     11. CRITICAL: 'loyalty_tier' table does NOT have 'customer_id'. To get loyalty info, you MUST join: sales -> customer -> loyalty_tier.
+    12. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
