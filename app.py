@@ -61,6 +61,7 @@ if dark_mode:
     GLOW = "0 0 40px rgba(0, 212, 255, 0.5)"
     GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     GRADIENT_ACCENT = "linear-gradient(135deg, #00d4ff 0%, #0099ff 100%)"
+    EXPANDER_ARROW = "#00d4ff"  # Cyan for dark mode
 else:
     # Vibrant light theme with dramatic effects
     ROOT_BG = "linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f8f9ff 100%)"
@@ -77,6 +78,7 @@ else:
     GLOW = "0 0 40px rgba(102, 126, 234, 0.4)"
     GRADIENT_PRIMARY = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     GRADIENT_ACCENT = "linear-gradient(135deg, #667eea 0%, #0099ff 100%)"
+    EXPANDER_ARROW = "#FFB800"  # Bright yellow for light mode
 
 def get_or_create_encryption_key():
     """Get or create encryption key for test database credentials"""
@@ -842,8 +844,8 @@ st.markdown(f"""
     
     /* Force Expander Arrow Color for both themes */
     [data-testid="stExpander"] summary svg {{
-        fill: {ACCENT} !important;
-        color: {ACCENT} !important;
+        fill: {EXPANDER_ARROW} !important;
+        color: {EXPANDER_ARROW} !important;
     }}
     
     [data-testid="stSidebar"] .stRadio label {{
