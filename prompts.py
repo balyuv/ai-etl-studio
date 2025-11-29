@@ -58,6 +58,8 @@ def get_system_prompt(db_type, schema_desc):
     23. Use table aliases exactly as defined in the query logic.
     24. If a column required for the answer exists in a joined dimension table (e.g., store name exists in `store` table, not in `sales`), you must SELECT it from the correct joined table alias (`st.name`, not `s.name`).
     25. Output only MySQL SQL — no explanation, no assumptions, no invalid syntax.
+    26. When using window functions for ranking, do NOT repeat aggregation inside ORDER BY.
+        Use the aggregated column alias instead.
     """
     else:  # PostgreSQL
         return f"""You are AskSQL, a PostgreSQL expert.
