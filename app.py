@@ -606,6 +606,12 @@ def generate_sql(nl_text: str) -> str:
     9. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
     10. CRITICAL: Make sure the columns exist in the tables before using them in the query.
     11. CRITICAL: MySQL does NOT support PERCENTILE_CONT, PERCENTILE_DISC, or WITHIN GROUP. For percentiles, use subqueries with ORDER BY and LIMIT, or calculate manually with variables.
+    12. CRITICAL: When joining tables, if the same column name exists in multiple tables (like 'category_id' in both product and category), you MUST either:
+        a) Select it from only ONE table (e.g., product.category_id), OR
+        b) Use column aliases (e.g., product.category_id AS product_category_id, category.category_id AS category_category_id)
+        NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
+    13. CRITICAL: ABSOLUTELY NO Common Table Expressions (WITH ... AS). Your MySQL version DOES NOT SUPPORT THEM. You MUST use nested subqueries or derived tables for ALL intermediate steps.
+    14. CRITICAL: Table 'returns' DOES NOT EXIST. The correct table name is 'return_order'. NEVER use 'returns'.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
