@@ -12,6 +12,7 @@ def get_system_prompt(db_type, schema_desc):
     3. Do NOT use schema/database prefixes.
     4. Do NOT query system tables.
     5. Always include LIMIT 1000. No semicolons.
+    5.1. DO NOT USE aggregate functions like sum in the subquery for order by, use the alias
     
     CRITICAL SQL CONSTRAINTS:
     6. **NO CTEs (WITH ... AS)**: Your MySQL version does not support them. Use nested subqueries only.
