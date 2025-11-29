@@ -631,6 +631,11 @@ def generate_sql(nl_text: str) -> str:
     19. **SLA Calculations**:
         - **Supplier SLA**: Use `restock_order`. (e.g. `restock_order.status = 'Received'`)
         - **Shipment/Delivery SLA**: Use `shipment`. (e.g. `DATEDIFF(sh.delivery_date, sh.expected_date)`)
+    20. ALWAYS reference the correct table and alias when selecting columns.
+    21. NEVER generate, guess, or include column names that do not exist in the actual schema.
+    22. If a column name is not found in the schema, do not include it in the query.
+    23. Use table aliases exactly as defined in the query logic.
+    24. If a column required for the answer exists in a joined dimension table (e.g., store name exists in `store` table, not in `sales`), you must SELECT it from the correct joined table alias (`st.name`, not `s.name`).
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
