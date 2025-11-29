@@ -51,7 +51,8 @@ if dark_mode:
     ROOT_BG_SOLID = "#0a0e27"
     ROOT_TEXT = "#ffffff"
     CARD_BG = "rgba(40, 48, 75, 0.75)"  # Lighter blue-gray for better visibility
-    INPUT_BG = "rgba(255, 255, 255, 0.08)" # Light overlay for inputs
+    INPUT_BG = "rgba(255, 255, 255, 0.9)" # High contrast for black text
+    INPUT_TEXT_COLOR = "#000000"
     CARD_BORDER = "rgba(88, 166, 255, 0.3)"
     ACCENT = "#00d4ff"
     ACCENT_HOVER = "#00f0ff"
@@ -69,6 +70,7 @@ else:
     ROOT_TEXT = "#1a202c"
     CARD_BG = "rgba(255, 255, 255, 0.85)"
     INPUT_BG = "rgba(255, 255, 255, 0.9)"
+    INPUT_TEXT_COLOR = "#000000"
     CARD_BORDER = "rgba(102, 126, 234, 0.25)"
     ACCENT = "#667eea"
     ACCENT_HOVER = "#5568d3"
@@ -742,6 +744,7 @@ theme_vars = {
     'ROOT_TEXT': ROOT_TEXT,
     'CARD_BG': CARD_BG,
     'INPUT_BG': INPUT_BG,
+    'INPUT_TEXT_COLOR': INPUT_TEXT_COLOR,
     'CARD_BORDER': CARD_BORDER,
     'ACCENT': ACCENT,
     'ACCENT_HOVER': ACCENT_HOVER,

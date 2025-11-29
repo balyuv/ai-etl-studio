@@ -73,7 +73,7 @@ def load_css_with_theme(theme_vars: dict) -> str:
     .stTextInput input, .stTextArea textarea, .stSelectbox select {{
         background: {theme_vars['INPUT_BG']};
         border: 2px solid {theme_vars['CARD_BORDER']};
-        color: {theme_vars['ROOT_TEXT']};
+        color: {theme_vars['INPUT_TEXT_COLOR']};
     }}
     
     .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {{
