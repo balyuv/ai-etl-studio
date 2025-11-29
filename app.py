@@ -615,6 +615,7 @@ def generate_sql(nl_text: str) -> str:
     15. CRITICAL: 'loyalty_tier' table does NOT have 'customer_id'. To get loyalty info, you MUST join: sales -> customer -> loyalty_tier.
     16. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
         (e.g., JOIN purchase_order ON sales.order_id = purchase_order.order_id JOIN promotion ON purchase_order.promo_id = promotion.promo_id)
+    17. CRITICAL: Use UNIQUE table aliases. Do NOT use the same alias (like 'c') for different tables (e.g., 'customer' and 'category'). Use distinct aliases like 'cust' and 'cat'.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
@@ -638,6 +639,7 @@ def generate_sql(nl_text: str) -> str:
     10. CRITICAL: Use EXACT table names from the schema. Do NOT hallucinate table names (e.g., use 'return_order', NOT 'returns').
     11. CRITICAL: 'loyalty_tier' table does NOT have 'customer_id'. To get loyalty info, you MUST join: sales -> customer -> loyalty_tier.
     12. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
+    13. CRITICAL: Use UNIQUE table aliases. Do NOT use the same alias (like 'c') for different tables. Use distinct aliases like 'cust' and 'cat'.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
