@@ -597,27 +597,24 @@ def generate_sql(nl_text: str) -> str:
     Rules:
     1. Build ONE valid MySQL SELECT query.
     2. Use ONLY tables and columns from the schema above.
-    3. Do NOT use schema/database prefixes (e.g., use 'table_name', NOT 'database.table_name').
-    4. Do NOT query information_schema, mysql, or any system tables.
-    5. If the user asks to "show tables" or "list tables", respond with: SELECT 'Available tables: {", ".join(TABLES)}' AS tables LIMIT 100
-    6. If the user asks for "summary", infer the correct table from the schema.
-    7. Always include LIMIT 1000 if not specified.
-    8. No semicolons.
-    9. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
-    10. CRITICAL: Make sure the columns exist in the tables before using them in the query.
-    11. CRITICAL: MySQL does NOT support PERCENTILE_CONT, PERCENTILE_DISC, or WITHIN GROUP. For percentiles, use subqueries with ORDER BY and LIMIT, or calculate manually with variables.
-    12. CRITICAL: When joining tables, if the same column name exists in multiple tables (like 'category_id' in both product and category), you MUST either:
-        a) Select it from only ONE table (e.g., product.category_id), OR
-        b) Use column aliases (e.g., product.category_id AS product_category_id, category.category_id AS category_category_id)
-        NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
-    13. CRITICAL: ABSOLUTELY NO Common Table Expressions (WITH ... AS). Your MySQL version DOES NOT SUPPORT THEM. You MUST use nested subqueries or derived tables for ALL intermediate steps.
-    14. CRITICAL: Table 'returns' DOES NOT EXIST. The correct table name is 'return_order'. NEVER use 'returns'.
-    15. CRITICAL: 'loyalty_tier' table join MUST use 'loyalty_tier_id'. Do NOT use 'tier_id' or 'segment_id'.
-        Correct: JOIN loyalty_tier ON customer.loyalty_tier_id = loyalty_tier.loyalty_tier_id
-        Incorrect: JOIN loyalty_tier ON customer.segment_id = loyalty_tier.tier_id
-    16. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
-        (e.g., JOIN purchase_order ON sales.order_id = purchase_order.order_id JOIN promotion ON purchase_order.promo_id = promotion.promo_id)
-    17. CRITICAL: Use UNIQUE table aliases. Do NOT use the same alias (like 'c') for different tables (e.g., 'customer' and 'category'). Use distinct aliases like 'cust' and 'cat'.
+    3. Do NOT use schema/database prefixes.
+    4. Do NOT query system tables.
+    5. Always include LIMIT 1000. No semicolons.
+    
+    CRITICAL SQL CONSTRAINTS:
+    6. **NO CTEs (WITH ... AS)**: Your MySQL version does not support them. Use nested subqueries only.
+    7. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
+    8. **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
+    9. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
+
+    CRITICAL SCHEMA CORRECTIONS (Memorize these):
+    10. **Table 'loyalty_tier'**: Join via `customer`. 
+        CORRECT: `JOIN loyalty_tier lt ON cust.loyalty_tier_id = lt.loyalty_tier_id`
+        WRONG: `tier_id`, `segment_id`, or joining directly to sales.
+    11. **Table 'promotion'**: Join via `purchase_order`.
+        CORRECT: `JOIN purchase_order po ON s.order_id = po.order_id JOIN promotion p ON po.promo_id = p.promo_id`
+        WRONG: Joining directly to sales.
+    12. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
@@ -628,20 +625,21 @@ def generate_sql(nl_text: str) -> str:
     Rules:
     1. Build ONE valid PostgreSQL SELECT query.
     2. Use ONLY tables and columns from the schema above.
-    3. Do NOT query information_schema, pg_catalog, or any system tables.
-    4. If the user asks to "show tables" or "list tables", respond with: SELECT 'Available tables: {", ".join(TABLES)}' AS tables LIMIT 100
-    5. If the user asks for "summary", infer the correct table from the schema.
-    6. Always include LIMIT 100 if not specified.
-    7. No semicolons.
-    8. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
-    9. CRITICAL: When joining tables, if the same column name exists in multiple tables (like 'category_id' in both product and category), you MUST either:
-        a) Select it from only ONE table (e.g., product.category_id), OR
-        b) Use column aliases (e.g., product.category_id AS product_category_id, category.category_id AS category_category_id)
-        NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
-    10. CRITICAL: Use EXACT table names from the schema. Do NOT hallucinate table names (e.g., use 'return_order', NOT 'returns').
-    11. CRITICAL: 'loyalty_tier' table join MUST use 'loyalty_tier_id'. Do NOT use 'tier_id' or 'segment_id'.
-    12. CRITICAL: 'promotion' table does NOT have 'order_id'. To get promotion info, you MUST join: sales -> purchase_order -> promotion.
-    13. CRITICAL: Use UNIQUE table aliases. Do NOT use the same alias (like 'c') for different tables. Use distinct aliases like 'cust' and 'cat'.
+    3. Do NOT query system tables.
+    4. Always include LIMIT 100. No semicolons.
+    
+    CRITICAL SQL CONSTRAINTS:
+    5. **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
+    6. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
+
+    CRITICAL SCHEMA CORRECTIONS (Memorize these):
+    7. **Table 'loyalty_tier'**: Join via `customer`. 
+        CORRECT: `JOIN loyalty_tier lt ON cust.loyalty_tier_id = lt.loyalty_tier_id`
+        WRONG: `tier_id`, `segment_id`, or joining directly to sales.
+    8. **Table 'promotion'**: Join via `purchase_order`.
+        CORRECT: `JOIN purchase_order po ON s.order_id = po.order_id JOIN promotion p ON po.promo_id = p.promo_id`
+        WRONG: Joining directly to sales.
+    9. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
