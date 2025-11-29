@@ -12,14 +12,13 @@ def get_system_prompt(db_type, schema_desc):
     3. Do NOT use schema/database prefixes.
     4. Do NOT query system tables.
     5. Always include LIMIT 1000. No semicolons.
-    5.1. DO NOT USE aggregate functions like sum in the subquery for order by in PARTITION use the alias
     
     CRITICAL SQL CONSTRAINTS:
     6. **NO CTEs (WITH ... AS)**: Your MySQL version does not support them. Use nested subqueries only.
     7. **NO WINDOW FUNCTIONS**: Your MySQL version does NOT support `OVER()`, `NTILE()`, `ROW_NUMBER()`, `RANK()`. Do NOT use them.
-       - WRONG: `ROW_NUMBER() OVER (PARTITION BY ...)`
-       - WRONG: `RANK() OVER (...)`
-       - RIGHT: Use standard `GROUP BY`, `ORDER BY`, and `LIMIT`.
+       - **ABSOLUTELY FORBIDDEN**: `OVER (PARTITION BY ...)`
+       - **REASON**: The server will throw a syntax error immediately.
+       - **SOLUTION**: Use standard `GROUP BY` and `ORDER BY` only.
     8. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
     9. **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
     10. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
@@ -58,12 +57,6 @@ def get_system_prompt(db_type, schema_desc):
     23. Use table aliases exactly as defined in the query logic.
     24. If a column required for the answer exists in a joined dimension table (e.g., store name exists in `store` table, not in `sales`), you must SELECT it from the correct joined table alias (`st.name`, not `s.name`).
     25. Output only MySQL SQL — no explanation, no assumptions, no invalid syntax.
-    26. When using window functions for ranking, do NOT repeat aggregation inside ORDER BY.
-        Use the aggregated column alias instead.
-        - Aggregation MUST happen before the window function executes
-        - The ORDER BY in the window MUST reference an alias, not a function
-        - If ranking by total sales, the alias must be named `total_sales` or `total_sales_amount`
-        - Any query violating this must be rewritten before returning
     """
     else:  # PostgreSQL
         return f"""You are AskSQL, a PostgreSQL expert.
