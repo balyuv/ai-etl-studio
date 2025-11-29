@@ -840,11 +840,11 @@ st.markdown(f"""
         color: {ROOT_TEXT} !important;
     }}
     
-    /* Force Expander Icon to be white */
-    [data-testid="stSidebar"] [data-testid="stExpander"] summary svg {{
+    /* Force Expander Arrow Color for both themes */
+    [data-testid="stExpander"] summary svg {
         fill: {ROOT_TEXT} !important;
         color: {ROOT_TEXT} !important;
-    }}
+    }
     
     [data-testid="stSidebar"] .stRadio label {{
         background: {INPUT_BG};
