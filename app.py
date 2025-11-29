@@ -664,8 +664,32 @@ def generate_sql(nl_text: str) -> str:
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
-        sql = r.choices[0].message.content.strip()
+        response_text = r.choices[0].message.content.strip()
+        
+        # Extract SQL from code blocks if present
+        # Look for ```sql ... ``` first
+        sql_match = re.search(r"```sql\s*(.*?)\s*```", response_text, re.DOTALL | re.IGNORECASE)
+        if sql_match:
+            sql = sql_match.group(1).strip()
+        else:
+            # Look for generic ``` ... ```
+            code_match = re.search(r"```\s*(.*?)\s*```", response_text, re.DOTALL)
+            if code_match:
+                sql = code_match.group(1).strip()
+            else:
+                # Fallback: assume the whole text is SQL
+                sql = response_text.strip()
+        
+        # Clean up SQL
         sql = sql.replace(";", "").strip()
+        
+        # Ensure it starts with SELECT (simple heuristic to clean up any remaining prefix if regex failed or wasn't used)
+        # This helps if the model returns "Here is the query: SELECT..." without code blocks
+        if not sql.upper().startswith("SELECT") and "SELECT " in sql.upper():
+             match = re.search(r"(SELECT\s+.*)", sql, re.DOTALL | re.IGNORECASE)
+             if match:
+                 sql = match.group(1)
+
         if not re.search(r"\blimit\b", sql.lower()):
             sql += " LIMIT 100"
         return sql
