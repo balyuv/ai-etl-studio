@@ -841,10 +841,10 @@ st.markdown(f"""
     }}
     
     /* Force Expander Arrow Color for both themes */
-    [data-testid="stExpander"] summary svg {
+    [data-testid="stExpander"] summary svg {{
         fill: {ROOT_TEXT} !important;
         color: {ROOT_TEXT} !important;
-    }
+    }}
     
     [data-testid="stSidebar"] .stRadio label {{
         background: {INPUT_BG};
