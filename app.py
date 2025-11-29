@@ -603,18 +603,19 @@ def generate_sql(nl_text: str) -> str:
     
     CRITICAL SQL CONSTRAINTS:
     6. **NO CTEs (WITH ... AS)**: Your MySQL version does not support them. Use nested subqueries only.
-    7. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
-    8. **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
-    9. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
+    7. **NO WINDOW FUNCTIONS**: Your MySQL version does NOT support `OVER()`, `NTILE()`, `ROW_NUMBER()`, `RANK()`. Do NOT use them.
+    8. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
+    9. **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
+    10. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
 
     CRITICAL SCHEMA CORRECTIONS (Memorize these):
-    10. **Table 'loyalty_tier'**: Join via `customer`. 
+    11. **Table 'loyalty_tier'**: Join via `customer`. 
         CORRECT: `JOIN loyalty_tier lt ON cust.loyalty_tier_id = lt.loyalty_tier_id`
         WRONG: `tier_id`, `segment_id`, or joining directly to sales.
-    11. **Table 'promotion'**: Join via `purchase_order`.
+    12. **Table 'promotion'**: Join via `purchase_order`.
         CORRECT: `JOIN purchase_order po ON s.order_id = po.order_id JOIN promotion p ON po.promo_id = p.promo_id`
         WRONG: Joining directly to sales.
-    12. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
+    13. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
