@@ -626,6 +626,7 @@ def generate_sql(nl_text: str) -> str:
         a) Select it from only ONE table (e.g., product.category_id), OR
         b) Use column aliases (e.g., product.category_id AS product_category_id, category.category_id AS category_category_id)
         NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
+    10. CRITICAL: Use EXACT table names from the schema. Do NOT hallucinate table names (e.g., use 'return_order', NOT 'returns').
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
