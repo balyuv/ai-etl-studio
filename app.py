@@ -602,6 +602,9 @@ def generate_sql(nl_text: str) -> str:
     CRITICAL SQL CONSTRAINTS:
     6. **NO CTEs (WITH ... AS)**: Your MySQL version does not support them. Use nested subqueries only.
     7. **NO WINDOW FUNCTIONS**: Your MySQL version does NOT support `OVER()`, `NTILE()`, `ROW_NUMBER()`, `RANK()`. Do NOT use them.
+       - WRONG: `ROW_NUMBER() OVER (PARTITION BY ...)`
+       - WRONG: `RANK() OVER (...)`
+       - RIGHT: Use standard `GROUP BY`, `ORDER BY`, and `LIMIT`.
     8. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
     9. **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
     10. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
@@ -625,7 +628,9 @@ def generate_sql(nl_text: str) -> str:
         - Frequency: `COUNT(DISTINCT s.order_id)`
         - Monetary: `SUM(s.sold_price)`
         Do NOT attempt to calculate 1-5 scores.
-    18. **"Top Customers" / Ranking**: Since `RANK()`/`ROW_NUMBER()` are not supported, just ORDER BY the metric and LIMIT. Do not try to partition by store.
+    18. **"Top Customers" / Ranking**: `RANK()` and `ROW_NUMBER()` are STRICTLY FORBIDDEN.
+       - If asked for "Top 3 per store", do NOT attempt to partition. Just return the Top 100 customers overall, ordered by Store and Sales.
+       - Example: `SELECT * FROM sales ORDER BY store_id, sold_price DESC LIMIT 100`
     19. **SLA Calculations**:
         - **Supplier SLA**: Use `restock_order`. (e.g. `restock_order.status = 'Received'`)
         - **Shipment/Delivery SLA**: Use `shipment`. (e.g. `DATEDIFF(sh.delivery_date, sh.expected_date)`)
