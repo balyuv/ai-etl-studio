@@ -59,6 +59,17 @@ def get_system_prompt(db_type, schema_desc):
         - **SLA Calculations**:
             - **Supplier SLA**: Use `restock_order`. (e.g. `restock_order.status = 'Received'`)
             - **Shipment/Delivery SLA**: Use `shipment`. (e.g. `DATEDIFF(sh.delivery_date, sh.expected_date)`)
+
+            ⚠️ IMPORTANT MYSQL RULE (MANDATORY):
+            - NEVER use aggregate functions (SUM, COUNT, AVG, MAX, MIN) inside a window ORDER BY in MySQL.
+            - ALWAYS compute aggregates BEFORE applying any window function.
+            - Window ORDER BY must reference an alias created in a prior query or CTE.
+
+            ❌ YOU MUST NOT GENERATE:
+                ROW_NUMBER() OVER (PARTITION BY store_id ORDER BY SUM(sold_price) DESC)
+
+            ✅ YOU MUST ALWAYS GENERATE:
+                ROW_NUMBER() OVER (PARTITION BY store_id ORDER BY total_sales DESC)
         
         FINAL CHECK:
         - Output only MySQL SQL — no explanation, no assumptions, no invalid syntax.
