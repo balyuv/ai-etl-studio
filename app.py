@@ -610,6 +610,7 @@ def generate_sql(nl_text: str) -> str:
     11. **DEFINE ALIASES BEFORE USE**: Ensure every alias used in SELECT/WHERE/GROUP BY is actually defined in the FROM/JOIN clause. For example, do not use `reg.region` if `reg` is not a table alias. Use `st.region` instead.
 
     CRITICAL SCHEMA CORRECTIONS (Memorize these):
+    11. **Table 'region'**: DOES NOT EXIST. `region` is a column in the `store` table. NEVER `JOIN region`.
     12. **Table 'loyalty_tier'**: Join via `customer`. 
         CORRECT: `JOIN loyalty_tier lt ON cust.loyalty_tier_id = lt.loyalty_tier_id`
         WRONG: `tier_id`, `segment_id`, or joining directly to sales.
@@ -618,7 +619,6 @@ def generate_sql(nl_text: str) -> str:
         WRONG: Joining directly to sales.
     14. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     15. **Table 'shipment'**: Does NOT have `supplier_id`. Do NOT join shipment to supplier.
-    16. **Table 'region'**: DOES NOT EXIST. `region` is a column in the `store` table. Do NOT join a region table.
 
     COMPLEX REQUEST HANDLING (MySQL 5.7 Compatibility):
     17. **RFM Analysis**: Since `NTILE()` is not supported, calculate RAW values only:
@@ -648,14 +648,14 @@ def generate_sql(nl_text: str) -> str:
     6. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
 
     CRITICAL SCHEMA CORRECTIONS (Memorize these):
-    7. **Table 'loyalty_tier'**: Join via `customer`. 
+    7. **Table 'region'**: DOES NOT EXIST. `region` is a column in the `store` table. NEVER `JOIN region`.
+    8. **Table 'loyalty_tier'**: Join via `customer`. 
         CORRECT: `JOIN loyalty_tier lt ON cust.loyalty_tier_id = lt.loyalty_tier_id`
         WRONG: `tier_id`, `segment_id`, or joining directly to sales.
-    8. **Table 'promotion'**: Join via `purchase_order`.
+    9. **Table 'promotion'**: Join via `purchase_order`.
         CORRECT: `JOIN purchase_order po ON s.order_id = po.order_id JOIN promotion p ON po.promo_id = p.promo_id`
         WRONG: Joining directly to sales.
-    9. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
-    10. **Table 'region'**: DOES NOT EXIST. `region` is a column in the `store` table. Do NOT join a region table.
+    10. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
