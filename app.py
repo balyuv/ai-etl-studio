@@ -647,6 +647,18 @@ def run_query(sql: str) -> pd.DataFrame:
             
         df = pd.read_sql(sql, conn)
         conn.close()
+        
+        # Fix duplicate column names if they exist
+        cols = pd.Series(df.columns)
+        if cols.duplicated().any():
+            # Add suffix to duplicate column names
+            for dup in cols[cols.duplicated()].unique():
+                dup_indices = [i for i, x in enumerate(cols) if x == dup]
+                for i, idx in enumerate(dup_indices):
+                    cols[idx] = f"{dup}_{i+1}"
+            df.columns = cols
+            st.warning(f"⚠️ Duplicate column names detected and renamed. Original query had duplicate columns.")
+        
         return df
     except Exception as e:
         st.error(f"❌ SQL Execution Failed: {e}")
