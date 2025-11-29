@@ -190,22 +190,4 @@ def load_css_with_theme(theme_vars: dict) -> str:
     </style>
     """
     
-    # Add JavaScript separately to avoid rendering issues
-    script = """
-    <script>
-    // Enable browser password manager
-    document.addEventListener('DOMContentLoaded', function() {
-        const inputs = document.querySelectorAll('input[type="password"]');
-        inputs.forEach(input => {
-            input.setAttribute('autocomplete', 'current-password');
-        });
-        
-        const userInputs = document.querySelectorAll('input[aria-label*="User"]');
-        userInputs.forEach(input => {
-            input.setAttribute('autocomplete', 'username');
-        });
-    });
-    </script>
-    """
-    
-    return dynamic_css + script
+    return dynamic_css
