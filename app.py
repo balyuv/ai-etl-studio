@@ -585,9 +585,12 @@ def generate_sql(nl_text: str) -> str:
 
     schema_desc = "\n".join(f'TABLE "{t}" (columns: {", ".join(schema_objects[t])})' for t in TABLES)
     
+    print  (f"******{schema_desc}******")
+    
     if DB_TYPE == "MySQL":
         system_prompt = f"""You are AskSQL, a MySQL expert.
-    
+
+
     Database Schema:
     {schema_desc}
     
@@ -619,6 +622,10 @@ def generate_sql(nl_text: str) -> str:
     6. Always include LIMIT 100 if not specified.
     7. No semicolons.
     8. CRITICAL: When using JOINs, ALWAYS prefix column names with their table name/alias in the SELECT clause (e.g., 'product.product_id', 'sales.product_id') to avoid ambiguous column errors.
+    9. CRITICAL: When joining tables, if the same column name exists in multiple tables (like 'category_id' in both product and category), you MUST either:
+        a) Select it from only ONE table (e.g., product.category_id), OR
+        b) Use column aliases (e.g., product.category_id AS product_category_id, category.category_id AS category_category_id)
+        NEVER select the same column name from multiple tables without aliasing - this causes "Duplicate column names" errors.
     """
     try:
         r = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role":"system","content":system_prompt},{"role":"user","content":nl_text}], temperature=0)
