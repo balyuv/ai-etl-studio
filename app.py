@@ -617,6 +617,18 @@ def generate_sql(nl_text: str) -> str:
         CORRECT: `JOIN purchase_order po ON s.order_id = po.order_id JOIN promotion p ON po.promo_id = p.promo_id`
         WRONG: Joining directly to sales.
     14. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
+    15. **Table 'shipment'**: Does NOT have `supplier_id`. Do NOT join shipment to supplier.
+
+    COMPLEX REQUEST HANDLING (MySQL 5.7 Compatibility):
+    16. **RFM Analysis**: Since `NTILE()` is not supported, calculate RAW values only:
+        - Recency: `DATEDIFF(CURDATE(), MAX(s.sold_date))`
+        - Frequency: `COUNT(DISTINCT s.order_id)`
+        - Monetary: `SUM(s.sold_price)`
+        Do NOT attempt to calculate 1-5 scores.
+    17. **"Top Customers" / Ranking**: Since `RANK()`/`ROW_NUMBER()` are not supported, just ORDER BY the metric and LIMIT. Do not try to partition by store.
+    18. **SLA Calculations**:
+        - **Supplier SLA**: Use `restock_order`. (e.g. `restock_order.status = 'Received'`)
+        - **Shipment/Delivery SLA**: Use `shipment`. (e.g. `DATEDIFF(sh.delivery_date, sh.expected_date)`)
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
