@@ -607,15 +607,16 @@ def generate_sql(nl_text: str) -> str:
     8. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
     9. **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
     10. **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
+    11. **DEFINE ALIASES BEFORE USE**: Ensure every alias used in SELECT/WHERE/GROUP BY is actually defined in the FROM/JOIN clause. For example, do not use `reg.region` if `reg` is not a table alias. Use `st.region` instead.
 
     CRITICAL SCHEMA CORRECTIONS (Memorize these):
-    11. **Table 'loyalty_tier'**: Join via `customer`. 
+    12. **Table 'loyalty_tier'**: Join via `customer`. 
         CORRECT: `JOIN loyalty_tier lt ON cust.loyalty_tier_id = lt.loyalty_tier_id`
         WRONG: `tier_id`, `segment_id`, or joining directly to sales.
-    12. **Table 'promotion'**: Join via `purchase_order`.
+    13. **Table 'promotion'**: Join via `purchase_order`.
         CORRECT: `JOIN purchase_order po ON s.order_id = po.order_id JOIN promotion p ON po.promo_id = p.promo_id`
         WRONG: Joining directly to sales.
-    13. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
+    14. **Table 'return_order'**: Use this exact name. DO NOT use 'returns'.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
