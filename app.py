@@ -842,10 +842,22 @@ st.markdown(f"""
         color: {ROOT_TEXT} !important;
     }}
     
-    /* Force Expander Arrow Color for both themes */
+    /* Force Expander Arrow Color for both themes - High Specificity */
     [data-testid="stExpander"] summary svg {{
         fill: {EXPANDER_ARROW} !important;
         color: {EXPANDER_ARROW} !important;
+        stroke: {EXPANDER_ARROW} !important;
+    }}
+    
+    [data-testid="stExpander"] summary svg path {{
+        fill: {EXPANDER_ARROW} !important;
+        stroke: {EXPANDER_ARROW} !important;
+    }}
+    
+    [data-testid="stExpander"] details summary svg {{
+        fill: {EXPANDER_ARROW} !important;
+        color: {EXPANDER_ARROW} !important;
+        stroke: {EXPANDER_ARROW} !important;
     }}
     
     [data-testid="stSidebar"] .stRadio label {{
