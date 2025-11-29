@@ -188,21 +188,24 @@ def load_css_with_theme(theme_vars: dict) -> str:
     
     {css}
     </style>
+    """
     
+    # Add JavaScript separately to avoid rendering issues
+    script = """
     <script>
     // Enable browser password manager
-    document.addEventListener('DOMContentLoaded', function() {{
+    document.addEventListener('DOMContentLoaded', function() {
         const inputs = document.querySelectorAll('input[type="password"]');
-        inputs.forEach(input => {{
+        inputs.forEach(input => {
             input.setAttribute('autocomplete', 'current-password');
-        }});
+        });
         
         const userInputs = document.querySelectorAll('input[aria-label*="User"]');
-        userInputs.forEach(input => {{
+        userInputs.forEach(input => {
             input.setAttribute('autocomplete', 'username');
-        }});
-    }});
+        });
+    });
     </script>
     """
     
-    return dynamic_css
+    return dynamic_css + script
