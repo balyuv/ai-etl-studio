@@ -585,8 +585,6 @@ def generate_sql(nl_text: str) -> str:
 
     schema_desc = "\n".join(f'TABLE "{t}" (columns: {", ".join(schema_objects[t])})' for t in TABLES)
     
-    print  (f"******{schema_desc}******")
-    
     if DB_TYPE == "MySQL":
         system_prompt = f"""You are AskSQL, a MySQL expert.
 
@@ -636,6 +634,7 @@ def generate_sql(nl_text: str) -> str:
     22. If a column name is not found in the schema, do not include it in the query.
     23. Use table aliases exactly as defined in the query logic.
     24. If a column required for the answer exists in a joined dimension table (e.g., store name exists in `store` table, not in `sales`), you must SELECT it from the correct joined table alias (`st.name`, not `s.name`).
+    25. Output only MySQL SQL — no explanation, no assumptions, no invalid syntax.
     """
     else:  # PostgreSQL
         system_prompt = f"""You are AskSQL, a PostgreSQL expert.
