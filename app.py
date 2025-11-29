@@ -628,9 +628,12 @@ def generate_sql(nl_text: str) -> str:
         - Frequency: `COUNT(DISTINCT s.order_id)`
         - Monetary: `SUM(s.sold_price)`
         Do NOT attempt to calculate 1-5 scores.
-    18. **"Top Customers" / Ranking**: `RANK()` and `ROW_NUMBER()` are STRICTLY FORBIDDEN.
-       - If asked for "Top 3 per store", do NOT attempt to partition. Just return the Top 100 customers overall, ordered by Store and Sales.
-       - Example: `SELECT * FROM sales ORDER BY store_id, sold_price DESC LIMIT 100`
+    18. **"Top Customers" / Ranking**: 
+       - **STOP!** Do NOT try to find the top N *per group*. This is impossible in your MySQL version.
+       - **INSTEAD**: Return the top N rows *overall*, ordered by the grouping column.
+       - **User Request**: "Top 3 customers per store"
+       - **Your Query**: `SELECT store_id, customer_id, SUM(sold_price) FROM sales GROUP BY store_id, customer_id ORDER BY store_id, SUM(sold_price) DESC LIMIT 100`
+       - **NEVER** use `RANK()`, `ROW_NUMBER()`, or variables like `@rn`.
     19. **SLA Calculations**:
         - **Supplier SLA**: Use `restock_order`. (e.g. `restock_order.status = 'Received'`)
         - **Shipment/Delivery SLA**: Use `shipment`. (e.g. `DATEDIFF(sh.delivery_date, sh.expected_date)`)
