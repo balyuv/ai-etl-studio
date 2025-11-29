@@ -60,6 +60,10 @@ def get_system_prompt(db_type, schema_desc):
     25. Output only MySQL SQL — no explanation, no assumptions, no invalid syntax.
     26. When using window functions for ranking, do NOT repeat aggregation inside ORDER BY.
         Use the aggregated column alias instead.
+        - Aggregation MUST happen before the window function executes
+        - The ORDER BY in the window MUST reference an alias, not a function
+        - If ranking by total sales, the alias must be named `total_sales` or `total_sales_amount`
+        - Any query violating this must be rewritten before returning
     """
     else:  # PostgreSQL
         return f"""You are AskSQL, a PostgreSQL expert.
