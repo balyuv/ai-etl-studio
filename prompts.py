@@ -11,7 +11,20 @@ def get_system_prompt(db_type, schema_desc):
     4. Do NOT query system tables.
     
     CRITICAL SQL CONSTRAINTS:
-    - DO NOT use "ORDER BY" SQL SYNTAX in "UNION ALL" OR "UNION" queries.
+    - **ABSOLUTELY FORBIDDEN: ORDER BY inside UNION/UNION ALL queries**
+      - ORDER BY can ONLY appear at the END of the entire UNION query, not within individual SELECT statements.
+      - WRONG: `SELECT ... ORDER BY col1 UNION SELECT ... ORDER BY col2` ❌
+      - CORRECT: `SELECT ... UNION SELECT ... ORDER BY col1` ✅
+    
+    - **AVOID UNION/UNION ALL for single-result queries with multiple criteria**
+      - When user asks for stores that are "highest AND powerful" or similar multiple criteria, use ONE query with:
+        - Multiple ORDER BY columns: `ORDER BY sales DESC, power_score DESC`
+        - OR multiple WHERE conditions: `WHERE sales > X AND power_score > Y`
+        - OR GROUP BY with aggregations: `GROUP BY store_id ORDER BY SUM(sales) DESC, AVG(power) DESC`
+      - WRONG: `SELECT ... WHERE highest UNION SELECT ... WHERE powerful` ❌
+      - CORRECT: `SELECT ... WHERE highest AND powerful ORDER BY sales DESC, power DESC` ✅
+      - Only use UNION when user explicitly asks for combining DIFFERENT result sets (e.g., "show me stores from region A OR stores from region B")
+    
     - **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
     - **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
     - **DEFINE ALIASES BEFORE USE**: Ensure every alias used in SELECT/WHERE/GROUP BY is actually defined in the FROM/JOIN clause.
