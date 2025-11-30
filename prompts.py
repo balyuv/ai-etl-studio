@@ -9,6 +9,7 @@ def get_system_prompt(db_type, schema_desc):
     2. Use ONLY tables and columns from the schema above.
     3. Do NOT use schema/database prefixes.
     4. Do NOT query system tables.
+    5. **DO NOT USE UNION/UNION ALL for ranking queries** ("highest and lowest", "top and bottom", etc.). Use ONE query with ORDER BY instead.
     
     CRITICAL SQL CONSTRAINTS:
     - **ABSOLUTELY FORBIDDEN: ORDER BY or LIMIT inside UNION/UNION ALL queries**
@@ -19,12 +20,13 @@ def get_system_prompt(db_type, schema_desc):
       - CORRECT: `SELECT ... UNION SELECT ... ORDER BY col1 LIMIT 10` ✅
     
     - **NEVER use UNION/UNION ALL for "highest AND lowest" or similar ranking queries**
-      - When user asks for "highest and lowest sales stores" or "top and bottom stores", they want BOTH results in ONE query.
-      - SOLUTION: Use ONE query with UNION, but ORDER BY only at the END, and use subqueries or window functions if needed.
-      - BETTER SOLUTION: Return all results sorted, or use separate columns to show both metrics.
-      - WRONG: `SELECT ... ORDER BY sales DESC LIMIT 1 UNION ALL SELECT ... ORDER BY sales ASC LIMIT 1` ❌
+      - When user asks for "highest and lowest sales stores" or "top and bottom stores", use ONE SINGLE query.
+      - DO NOT use UNION at all for these queries. MySQL 5.7 does NOT support ORDER BY inside UNION subqueries, even with parentheses.
+      - SOLUTION: Return all results sorted in ONE query. The user can see both highest (top) and lowest (bottom) in the results.
+      - WRONG: `SELECT ... ORDER BY sales DESC LIMIT 1 UNION ALL SELECT ... ORDER BY sales ASC LIMIT 1` ❌ SYNTAX ERROR
+      - WRONG: `(SELECT ... ORDER BY sales DESC LIMIT 1) UNION ALL (SELECT ... ORDER BY sales ASC LIMIT 1)` ❌ SYNTAX ERROR (ORDER BY in parentheses still fails)
       - CORRECT: `SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales DESC LIMIT 100` ✅
-      - OR: `(SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales DESC LIMIT 1) UNION ALL (SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales ASC LIMIT 1) ORDER BY total_sales DESC` ✅
+      - This single query shows highest at top and lowest at bottom when user views all results.
     
     - **AVOID UNION/UNION ALL for single-result queries with multiple criteria**
       - When user asks for stores that are "highest AND powerful" or similar multiple criteria, use ONE query with:
@@ -69,17 +71,20 @@ def get_system_prompt(db_type, schema_desc):
            - **SOLUTION**: Use standard `GROUP BY` and `ORDER BY` only.
         8. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
         
-        MYSQL UNION/ORDER BY SYNTAX RULES (CRITICAL):
-        9. **ORDER BY and LIMIT inside UNION queries will cause ERROR 1221**
-           - MySQL does NOT allow ORDER BY or LIMIT inside individual SELECT statements within UNION/UNION ALL.
-           - If you need to order/limit before UNION, wrap each SELECT in parentheses and order at the END.
+        MYSQL UNION/ORDER BY SYNTAX RULES (CRITICAL - READ CAREFULLY):
+        9. **ORDER BY and LIMIT inside UNION queries cause SYNTAX ERRORS (ERROR 1221 or ERROR 1064)**
+           - MySQL 5.7 does NOT allow ORDER BY or LIMIT inside ANY SELECT statement within UNION/UNION ALL.
+           - This includes ORDER BY inside parentheses: `(SELECT ... ORDER BY ...)` is FORBIDDEN in UNION queries.
            - WRONG: `SELECT ... ORDER BY col DESC LIMIT 1 UNION ALL SELECT ... ORDER BY col ASC LIMIT 1` ❌ ERROR 1221
-           - CORRECT: `(SELECT ... LIMIT 1) UNION ALL (SELECT ... LIMIT 1) ORDER BY col DESC` ✅
-           - EVEN BETTER: Avoid UNION for ranking queries. Use ONE query: `SELECT ... ORDER BY col DESC LIMIT 100`
-        10. **For "highest and lowest" queries**: Return all results sorted, or use subqueries in parentheses.
-            - User: "highest and lowest sales stores"
-            - CORRECT: `SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales DESC LIMIT 100`
-            - This shows both highest (top) and lowest (bottom) when user scrolls, or they can see the full range.
+           - WRONG: `(SELECT ... ORDER BY col DESC LIMIT 1) UNION ALL (SELECT ... ORDER BY col ASC LIMIT 1)` ❌ ERROR 1064 (syntax error)
+           - The ONLY way to use ORDER BY with UNION is at the very END: `SELECT ... UNION SELECT ... ORDER BY col LIMIT 10` ✅
+           - BUT: For ranking queries ("highest and lowest"), DO NOT use UNION at all. Use ONE query instead.
+        10. **For "highest and lowest" or "top and bottom" queries - USE ONE QUERY ONLY**
+            - NEVER use UNION for these queries. MySQL syntax does not support it.
+            - User: "highest and lowest sales stores" or "top and bottom stores"
+            - CORRECT (ONLY OPTION): `SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales DESC LIMIT 100` ✅
+            - This single query shows highest at top (first rows) and lowest at bottom (last rows) in the sorted results.
+            - User can see both extremes in one result set without needing UNION.
         
         COMPLEX REQUEST HANDLING:
         - **RFM Analysis**: Since `NTILE()` is not supported, calculate RAW values only:
