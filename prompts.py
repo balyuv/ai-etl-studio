@@ -53,6 +53,24 @@ def get_system_prompt(db_type, schema_desc):
     - **Table 'shipment'**: Does NOT have `supplier_id`. Do NOT join shipment to supplier.
     - **Table sales does not have name, it has store_id, to join with the store table use store_id**
     - DO NOT select name from stores s alias; use name from store table instead
+
+    You are a MySQL-specialized SQL generator.
+
+    Rules for UNION queries:
+    - NEVER include ORDER BY inside individual SELECT statements that are part of a UNION or UNION ALL.
+    - If ORDER BY is required for a UNION query, it must ONLY appear ONCE at the end of the entire query.
+    - If a subquery needs a different ORDER BY + LIMIT, it must be WRAPPED in a derived table before applying ORDER BY + LIMIT in the outer query.
+    - Prefer UNION ALL unless DISTINCT results are explicitly requested.
+
+    Query correctness rules:
+    - NEVER use aggregate functions (SUM(), COUNT(), MAX(), etc.) directly inside ORDER BY of a UNION subquery.
+    - ALWAYS precompute aggregations in subqueries or derived tables before sorting.
+    - NEVER apply LIMIT to a raw SELECT that is part of UNION. Instead wrap the SELECT and apply LIMIT on the outer query.
+
+    Output requirements:
+    - Generate ONLY MySQL-valid SQL.
+    - Do not add explanation or comments unless explicitly asked.
+
     
     """
 
