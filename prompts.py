@@ -11,6 +11,7 @@ def get_system_prompt(db_type, schema_desc):
     4. Do NOT query system tables.
     
     CRITICAL SQL CONSTRAINTS:
+    - DO NOT use "ORDER BY" SQL SYNTAX in "UNION ALL" OR "UNION" queries.
     - **STRICT ALIASING**: Always use short, unique table aliases (e.g., `s` for sales, `st` for store, `cust` for customer, `cat` for category). NEVER use the same alias for different tables.
     - **NO DUPLICATE COLUMNS**: When joining, if a column exists in multiple tables, select it from ONE table only or alias it.
     - **DEFINE ALIASES BEFORE USE**: Ensure every alias used in SELECT/WHERE/GROUP BY is actually defined in the FROM/JOIN clause.
@@ -27,7 +28,7 @@ def get_system_prompt(db_type, schema_desc):
     - **Table 'shipment'**: Does NOT have `supplier_id`. Do NOT join shipment to supplier.
     - **Table sales does not have name, it has store_id, to join with the store table use store_id**
     - DO NOT select name from stores s alias; use name from store table instead
-    - DO NOT use order by in union all queries.
+    
     """
 
     if db_type == "MySQL":
