@@ -11,10 +11,20 @@ def get_system_prompt(db_type, schema_desc):
     4. Do NOT query system tables.
     
     CRITICAL SQL CONSTRAINTS:
-    - **ABSOLUTELY FORBIDDEN: ORDER BY inside UNION/UNION ALL queries**
-      - ORDER BY can ONLY appear at the END of the entire UNION query, not within individual SELECT statements.
-      - WRONG: `SELECT ... ORDER BY col1 UNION SELECT ... ORDER BY col2` ❌
-      - CORRECT: `SELECT ... UNION SELECT ... ORDER BY col1` ✅
+    - **ABSOLUTELY FORBIDDEN: ORDER BY or LIMIT inside UNION/UNION ALL queries**
+      - ORDER BY and LIMIT can ONLY appear at the END of the entire UNION query, NEVER within individual SELECT statements.
+      - This will cause SQL syntax error: "Incorrect usage of UNION and ORDER BY"
+      - WRONG: `SELECT ... ORDER BY col1 LIMIT 1 UNION ALL SELECT ... ORDER BY col2 LIMIT 1` ❌ SYNTAX ERROR
+      - WRONG: `SELECT ... ORDER BY col1 UNION SELECT ... ORDER BY col2` ❌ SYNTAX ERROR
+      - CORRECT: `SELECT ... UNION SELECT ... ORDER BY col1 LIMIT 10` ✅
+    
+    - **NEVER use UNION/UNION ALL for "highest AND lowest" or similar ranking queries**
+      - When user asks for "highest and lowest sales stores" or "top and bottom stores", they want BOTH results in ONE query.
+      - SOLUTION: Use ONE query with UNION, but ORDER BY only at the END, and use subqueries or window functions if needed.
+      - BETTER SOLUTION: Return all results sorted, or use separate columns to show both metrics.
+      - WRONG: `SELECT ... ORDER BY sales DESC LIMIT 1 UNION ALL SELECT ... ORDER BY sales ASC LIMIT 1` ❌
+      - CORRECT: `SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales DESC LIMIT 100` ✅
+      - OR: `(SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales DESC LIMIT 1) UNION ALL (SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales ASC LIMIT 1) ORDER BY total_sales DESC` ✅
     
     - **AVOID UNION/UNION ALL for single-result queries with multiple criteria**
       - When user asks for stores that are "highest AND powerful" or similar multiple criteria, use ONE query with:
@@ -58,6 +68,18 @@ def get_system_prompt(db_type, schema_desc):
            - **REASON**: The server will throw a syntax error immediately.
            - **SOLUTION**: Use standard `GROUP BY` and `ORDER BY` only.
         8. **NO PERCENTILE functions**: Use subqueries with ORDER BY and LIMIT.
+        
+        MYSQL UNION/ORDER BY SYNTAX RULES (CRITICAL):
+        9. **ORDER BY and LIMIT inside UNION queries will cause ERROR 1221**
+           - MySQL does NOT allow ORDER BY or LIMIT inside individual SELECT statements within UNION/UNION ALL.
+           - If you need to order/limit before UNION, wrap each SELECT in parentheses and order at the END.
+           - WRONG: `SELECT ... ORDER BY col DESC LIMIT 1 UNION ALL SELECT ... ORDER BY col ASC LIMIT 1` ❌ ERROR 1221
+           - CORRECT: `(SELECT ... LIMIT 1) UNION ALL (SELECT ... LIMIT 1) ORDER BY col DESC` ✅
+           - EVEN BETTER: Avoid UNION for ranking queries. Use ONE query: `SELECT ... ORDER BY col DESC LIMIT 100`
+        10. **For "highest and lowest" queries**: Return all results sorted, or use subqueries in parentheses.
+            - User: "highest and lowest sales stores"
+            - CORRECT: `SELECT store_id, SUM(sold_price) AS total_sales FROM sales GROUP BY store_id ORDER BY total_sales DESC LIMIT 100`
+            - This shows both highest (top) and lowest (bottom) when user scrolls, or they can see the full range.
         
         COMPLEX REQUEST HANDLING:
         - **RFM Analysis**: Since `NTILE()` is not supported, calculate RAW values only:
