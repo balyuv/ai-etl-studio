@@ -111,9 +111,9 @@ def render_main_header(gradient_primary, accent, secondary):
                 -webkit-text-fill-color: transparent;
                 text-shadow: 0 4px 30px {accent}40;
                 filter: drop-shadow(0 0 20px {accent}30);
-            ">✨ Ask Questions. Get Answers - </span>
+            ">✨ Ask Questions. Get Answers  </span>
             <span style="
-                color: #2d3748;
+                color: #1a202c;
                 text-shadow: none;
                 filter: none;
                 font-style: italic;
