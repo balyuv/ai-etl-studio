@@ -116,6 +116,7 @@ def render_main_header(gradient_primary, accent, secondary):
                 color: #2d3748;
                 text-shadow: none;
                 filter: none;
+                font-style: italic;
             ">from your database.</span>
             <span style="
                 background: {gradient_primary};
