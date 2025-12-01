@@ -113,7 +113,7 @@ def render_main_header(gradient_primary, accent, secondary):
                 filter: drop-shadow(0 0 20px {accent}30);
             ">✨ Ask Questions. Get Answers  </span>
             <span style="
-                color: #1a202c;
+                color: #718096;
                 text-shadow: none;
                 filter: none;
                 font-style: italic;
