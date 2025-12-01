@@ -101,16 +101,29 @@ def render_main_header(gradient_primary, accent, secondary):
             font-size: 3.5rem;
             font-weight: 900;
             margin-bottom: 15px;
-            background: {gradient_primary};
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             display: inline-block;
             letter-spacing: -0.04em;
             line-height: 1;
-            text-shadow: 0 4px 30px {accent}40;
-            filter: drop-shadow(0 0 20px {accent}30);
         ">
-            ✨ Ask Questions. Get Answers. ✨
+            <span style="
+                background: {gradient_primary};
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: 0 4px 30px {accent}40;
+                filter: drop-shadow(0 0 20px {accent}30);
+            ">✨ Ask Questions. Get Answers - </span>
+            <span style="
+                color: #2d3748;
+                text-shadow: none;
+                filter: none;
+            ">from your database.</span>
+            <span style="
+                background: {gradient_primary};
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: 0 4px 30px {accent}40;
+                filter: drop-shadow(0 0 20px {accent}30);
+            "> ✨</span>
         </h1>
         <div style="
             font-size: 1.25rem;
